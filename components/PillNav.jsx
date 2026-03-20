@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
+import { supabase } from '@/lib/supabase';
+import { User, LogOut, ChevronDown } from 'lucide-react';
 import './PillNav.css';
 
 const PillNav = ({
@@ -21,8 +23,11 @@ const PillNav = ({
   initialLoadAnimation = true
 }) => {
   const pathname = usePathname();
+  const router = useRouter();
   const [currentHash, setCurrentHash] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const circleRefs = useRef([]);
   const tlRefs = useRef([]);
   const activeTweenRefs = useRef([]);
@@ -37,7 +42,24 @@ const PillNav = ({
     setCurrentHash(window.location.hash);
     const handleHashChange = () => setCurrentHash(window.location.hash);
     window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    
+    // Auth Listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      if (event === 'SIGNED_OUT') {
+        localStorage.removeItem('isLoggedIn');
+      }
+    });
+
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -210,6 +232,14 @@ const PillNav = ({
     }
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    localStorage.removeItem('isLoggedIn');
+    window.dispatchEvent(new Event('auth-change'));
+    setUser(null);
+    router.push('/');
+  };
+
   const isActive = (href) => {
     if (href === '/') return pathname === '/';
     return pathname.startsWith(href) || (currentHash && href.includes(currentHash));
@@ -264,12 +294,34 @@ const PillNav = ({
 
         {/* Desktop Actions */}
         <div className="desktop-only flex items-center gap-4 ml-2">
-            <Link href="/login" className="text-[13px] font-bold text-slate-400 hover:text-gold-500 uppercase tracking-widest transition-colors px-4 py-2">
-                Log In
-            </Link>
-            <Link href="/register" className="text-[13px] font-bold text-black bg-gold-500 hover:bg-gold-400 uppercase tracking-widest px-6 py-2.5 rounded-full transition-all shadow-lg shadow-gold-900/40">
-                Register
-            </Link>
+            {user ? (
+                <div className="relative flex items-center gap-3">
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center text-black font-bold text-xs uppercase">
+                      {user.user_metadata?.first_name?.[0] || user.email?.[0] || 'U'}
+                    </div>
+                    <span className="text-[13px] font-bold text-white uppercase tracking-widest hidden xl:block">
+                      {user.user_metadata?.first_name || 'Trader'}
+                    </span>
+                  </div>
+                  <button 
+                    onClick={handleSignOut}
+                    className="p-2.5 rounded-full border border-white/10 bg-white/5 hover:bg-red-500/10 hover:border-red-500/20 text-slate-400 hover:text-red-400 transition-all"
+                    title="Sign Out"
+                  >
+                    <LogOut size={18} />
+                  </button>
+                </div>
+            ) : (
+                <>
+                    <Link href="/login" className="text-[13px] font-bold text-slate-400 hover:text-gold-500 uppercase tracking-widest transition-colors px-4 py-2">
+                        Log In
+                    </Link>
+                    <Link href="/register" className="text-[13px] font-bold text-black bg-gold-500 hover:bg-gold-400 uppercase tracking-widest px-6 py-2.5 rounded-full transition-all shadow-lg shadow-gold-900/40">
+                        Register
+                    </Link>
+                </>
+            )}
         </div>
 
         <button
@@ -297,12 +349,38 @@ const PillNav = ({
             </li>
           ))}
           <li className="mt-8 pt-8 border-t border-white/10 flex flex-col gap-4">
-              <Link href="/login" onClick={() => toggleMobileMenu()} className="text-xl font-bold text-gold-500 uppercase tracking-widest">
-                  Log In
-              </Link>
-              <Link href="/register" onClick={() => toggleMobileMenu()} className="text-xl font-bold bg-gold-500 text-black py-4 rounded-3xl uppercase tracking-widest text-center">
-                  Register Now
-              </Link>
+              {user ? (
+                  <>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center text-black font-bold text-lg">
+                        {user.user_metadata?.first_name?.[0] || user.email?.[0]}
+                      </div>
+                      <div>
+                        <p className="text-white font-bold text-lg leading-none uppercase">
+                          {user.user_metadata?.first_name || 'Member'}
+                        </p>
+                        <p className="text-slate-500 text-xs mt-1 lowercase">
+                          {user.email}
+                        </p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => { handleSignOut(); toggleMobileMenu(); }}
+                      className="text-xl font-bold text-red-400 uppercase tracking-widest text-left flex items-center gap-2"
+                    >
+                      <LogOut size={20} /> Sign Out
+                    </button>
+                  </>
+              ) : (
+                  <>
+                    <Link href="/login" onClick={() => toggleMobileMenu()} className="text-xl font-bold text-gold-500 uppercase tracking-widest">
+                        Log In
+                    </Link>
+                    <Link href="/register" onClick={() => toggleMobileMenu()} className="text-xl font-bold bg-gold-500 text-black py-4 rounded-3xl uppercase tracking-widest text-center">
+                        Register Now
+                    </Link>
+                  </>
+              )}
           </li>
         </ul>
       </div>
