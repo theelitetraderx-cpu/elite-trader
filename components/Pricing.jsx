@@ -75,27 +75,27 @@ export default function Pricing() {
   ];
 
   return (
-    <section id="pricing" className="bg-black py-32 relative border-t border-white/5">
+    <section id="pricing" className="bg-black py-20 md:py-32 relative border-t border-white/5">
       {/* Background glow effects */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[600px] bg-gold-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
-        <div className="text-center mb-20 max-w-2xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-medium text-white mb-6 tracking-tight">
-            Invest in your trading edge.<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-600">Lifetime Access.</span>
+        <div className="text-center mb-16 md:mb-20 max-w-2xl mx-auto px-4 sm:px-0">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-white mb-6 tracking-tight">
+            Invest in your trading edge.<br className="hidden md:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-600 md:ml-2">Lifetime Access.</span>
           </h2>
-          <p className="text-slate-400 text-lg leading-relaxed mb-10">
+          <p className="text-slate-400 text-base md:text-lg leading-relaxed mb-10">
             Choose the learning path that fits your goals. Unlock professional strategies, live coaching, and active community signals.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-y-12 lg:gap-6 items-start max-w-md lg:max-w-5xl mx-auto">
           {plans.map((plan, i) => (
-            <div key={i} className={`relative transition-all ${plan.featured ? 'scale-[1.03] z-20' : 'z-10'}`}>
+            <div key={i} className={`relative transition-all ${plan.featured ? 'lg:scale-[1.03] z-20' : 'z-10'}`}>
               {plan.featured && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-gold-500 to-gold-600 text-black px-5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-[0_0_15px_rgba(212,175,55,0.5)] z-30">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-gold-500 to-gold-600 text-black px-5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-[0_0_15px_rgba(212,175,55,0.5)] z-30 whitespace-nowrap">
                   Most Popular
                 </div>
               )}
@@ -107,15 +107,15 @@ export default function Pricing() {
                 glowIntensity={plan.featured ? 1.2 : 0.9}
                 className={plan.featured ? 'shadow-[0_0_60px_rgba(212,175,55,0.15)] h-full w-full block' : 'h-full w-full block'}
               >
-                <div className="p-8 h-full flex flex-col justify-between">
+                <div className="p-6 md:p-8 h-full flex flex-col justify-between">
                   <div>
                     <div className="text-gold-400 text-sm font-medium mb-3 uppercase tracking-widest flex items-center gap-2">
                       <div className={`w-1.5 h-1.5 rounded-full ${plan.featured ? 'bg-gold-300 shadow-[0_0_5px_#ffd700]' : 'bg-slate-500'} `}></div> {plan.target}
                     </div>
-                    <div className="text-4xl font-light text-white mb-6 tracking-tight">{plan.size}</div>
+                    <div className="text-3xl md:text-4xl font-light text-white mb-6 tracking-tight">{plan.size}</div>
 
                     <div className="flex items-baseline gap-2 mb-8 pb-8 border-b border-white/5">
-                      <div className="text-5xl font-medium text-white">{plan.price}</div>
+                      <div className="text-4xl md:text-5xl font-medium text-white">{plan.price}</div>
                     </div>
 
                     <button

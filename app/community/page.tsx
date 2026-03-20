@@ -77,7 +77,7 @@ export default function CommunityPage() {
               </div>
             </div>
             
-            <div className="lg:w-1/2 h-[500px] relative flex items-center justify-center">
+            <div className="lg:w-1/2 w-full h-[320px] sm:h-[420px] md:h-[500px] relative flex items-center justify-center">
               <CardSwap width={320} height={450} delay={4000}>
                 <SwapCard>
                   <img src="/community/profit1.png" alt="Profit 1" className="w-full h-full object-cover" />

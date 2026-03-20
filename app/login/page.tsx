@@ -4,17 +4,41 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem('isLoggedIn', 'true');
-    window.dispatchEvent(new Event('auth-change'));
-    router.push('/');
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) throw signInError;
+
+      if (data?.user) {
+        localStorage.setItem('isLoggedIn', 'true');
+        window.dispatchEvent(new Event('auth-change'));
+        router.push('/');
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,13 +52,13 @@ export default function LoginPage() {
         <div className="absolute top-0 left-0 right-0 h-1/4 bg-gradient-to-b from-black to-transparent z-10" />
 
         {/* Logo */}
-        <div className="relative z-20 flex flex-col items-center">
+        <div className="relative z-20 flex flex-col items-center mix-blend-screen">
           <Image
             src="/elite-logo.png"
             alt="Elite Trader Logo"
             width={320}
             height={320}
-            className="object-contain drop-shadow-[0_0_60px_rgba(212,175,55,0.4)] mix-blend-screen"
+            className="object-contain"
             priority
           />
           <div className="mt-8 text-center">
@@ -70,7 +94,7 @@ export default function LoginPage() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold-500/40 to-transparent" />
 
         {/* Mobile logo */}
-        <div className="lg:hidden flex justify-center mb-10">
+        <div className="lg:hidden flex justify-center mb-10 mix-blend-screen">
           <Image src="/elite-logo.png" alt="Elite Trader" width={100} height={100} className="object-contain" />
         </div>
 
@@ -86,6 +110,11 @@ export default function LoginPage() {
               Create one free
             </Link>
           </p>
+          {error && (
+            <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
         </div>
 
         {/* Form */}
@@ -97,6 +126,9 @@ export default function LoginPage() {
             </label>
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
               placeholder="you@example.com"
               className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-4 text-white placeholder-slate-600 focus:outline-none focus:border-gold-500/60 focus:bg-white/[0.05] transition-all text-sm"
             />
@@ -115,6 +147,9 @@ export default function LoginPage() {
             <div className="relative">
               <input
                 type={showPass ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
                 placeholder="••••••••"
                 className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-4 text-white placeholder-slate-600 focus:outline-none focus:border-gold-500/60 focus:bg-white/[0.05] transition-all text-sm pr-12"
               />
@@ -137,10 +172,17 @@ export default function LoginPage() {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full mt-2 py-4 rounded-xl bg-gold-500 hover:bg-gold-400 text-black font-bold text-sm tracking-widest uppercase transition-all shadow-[0_0_30px_rgba(212,175,55,0.25)] hover:shadow-[0_0_40px_rgba(212,175,55,0.4)] flex items-center justify-center gap-2 group"
+            disabled={loading}
+            className={`w-full mt-2 py-4 rounded-xl bg-gold-500 hover:bg-gold-400 text-black font-bold text-sm tracking-widest uppercase transition-all shadow-[0_0_30px_rgba(212,175,55,0.25)] hover:shadow-[0_0_40px_rgba(212,175,55,0.4)] flex items-center justify-center gap-2 group ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Sign In
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            {loading ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <>
+                Sign In
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </>
+            )}
           </button>
 
           {/* Divider */}

@@ -1,6 +1,6 @@
 import { Instagram, Send, MessageSquare, ArrowRight, Users } from "lucide-react";
 import StarBorder from "./StarBorder";
-import ElectricBorder from "./ElectricBorder";
+import BorderGlow from "./BorderGlow";
 
 const communities = [
   {
@@ -53,12 +53,14 @@ export default function CommunitySection() {
            
            <div className="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-3 gap-6 reveal reveal-delayed-1">
              {communities.map((item, i) => (
-               <ElectricBorder 
+               <BorderGlow 
                  key={i} 
-                 color="#d4af37"
+                 glowColor="45 80 50"
+                 backgroundColor="#0f0f0f"
                  borderRadius={24}
-                 speed={1.5}
-                 chaos={0.15}
+                 glowIntensity={1.0}
+                 colors={['#d4af37', '#ffd700', '#b8860b']}
+                 className="h-full w-full block"
                >
                  <div className="p-6 h-full relative overflow-hidden group">
                    {/* Hover Gradient Overlay */}
@@ -82,7 +84,7 @@ export default function CommunitySection() {
                      Join Here <ArrowRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
                    </a>
                  </div>
-               </ElectricBorder>
+               </BorderGlow>
              ))}
            </div>
         </div>

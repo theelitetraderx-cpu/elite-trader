@@ -73,7 +73,7 @@ export default function SplashLoader() {
                 alt="Elite Trader Logo" 
                 width={160} 
                 height={160} 
-                className="object-contain mix-blend-screen drop-shadow-[0_0_30px_rgba(212,175,55,0.6)] relative z-10"
+                className="object-contain mix-blend-screen relative z-10"
                 priority
               />
             </motion.div>

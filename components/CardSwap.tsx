@@ -1,4 +1,4 @@
-import React, { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo, useRef } from 'react';
+import React, { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import './CardSwap.css';
 
@@ -29,14 +29,21 @@ interface CardSwapProps {
   children: React.ReactNode;
 }
 
-const makeSlot = (i: number, distX: number, distY: number, total: number) => ({
+interface Slot {
+  x: number;
+  y: number;
+  z: number;
+  zIndex: number;
+}
+
+const makeSlot = (i: number, distX: number, distY: number, total: number): Slot => ({
   x: i * distX,
   y: -i * distY,
   z: -i * distX * 1.5,
   zIndex: total - i
 });
 
-const placeNow = (el: HTMLElement, slot: any, skew: number) =>
+const placeNow = (el: HTMLElement, slot: Slot, skew: number) =>
   gsap.set(el, {
     x: slot.x,
     y: slot.y,
@@ -93,13 +100,40 @@ const CardSwap: React.FC<CardSwapProps> = ({
   const intervalRef = useRef<number | null>(null);
   const container = useRef<HTMLDivElement>(null);
 
+  const [computedSize, setComputedSize] = useState({ width, height });
+
+  useEffect(() => {
+    const resize = () => {
+      if (!container.current) return;
+      const availableWidth = container.current.clientWidth;
+      const maxCardWidth = Math.min(width, availableWidth * 0.92);
+      const scale = maxCardWidth / width;
+      const newHeight = Math.round(height * scale);
+      const newWidth = Math.round(maxCardWidth);
+
+      setComputedSize((prev) => {
+        if (prev.width === newWidth && prev.height === newHeight) {
+          return prev;
+        }
+        return { width: newWidth, height: newHeight };
+      });
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+    return () => window.removeEventListener('resize', resize);
+  }, [container, width, height]);
+
   useEffect(() => {
     const total = refs.length;
-    
+    const distanceScale = Math.max(0.65, computedSize.width / width);
+    const scaledCardDistance = cardDistance * distanceScale;
+    const scaledVerticalDistance = verticalDistance * distanceScale;
+
     // Initial placement
     refs.forEach((r, i) => {
       if (r.current) {
-        placeNow(r.current, makeSlot(i, cardDistance, verticalDistance, total), skewAmount);
+        placeNow(r.current, makeSlot(i, scaledCardDistance, scaledVerticalDistance, total), skewAmount);
       }
     });
 
@@ -128,7 +162,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
       rest.forEach((idx, i) => {
         const el = refs[idx].current;
         if (!el) return;
-        const slot = makeSlot(i, cardDistance, verticalDistance, refs.length);
+        const slot = makeSlot(i, scaledCardDistance, scaledVerticalDistance, refs.length);
         tl.set(el, { zIndex: slot.zIndex }, 'promote');
         tl.to(
           el,
@@ -143,7 +177,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
         );
       });
 
-      const backSlot = makeSlot(refs.length - 1, cardDistance, verticalDistance, refs.length);
+      const backSlot = makeSlot(refs.length - 1, scaledCardDistance, scaledVerticalDistance, refs.length);
       tl.addLabel('return', `promote+=${config.durMove * config.returnDelay}`);
       tl.call(
         () => {
@@ -197,18 +231,23 @@ const CardSwap: React.FC<CardSwapProps> = ({
   const rendered = useMemo(() => 
     childArr.map((child, i) => {
       if (!isValidElement(child)) return child;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const element = child as React.ReactElement<any>;
       return cloneElement(element, {
         key: i,
         ref: refs[i],
-        style: { width, height, ...(element.props.style ?? {}) },
+        style: {
+          width: computedSize.width,
+          height: computedSize.height,
+          ...(element.props.style ?? {})
+        },
         onClick: (e: React.MouseEvent) => {
           element.props.onClick?.(e);
           onCardClick?.(i);
         }
       });
     }),
-    [childArr, refs, width, height, onCardClick]
+    [childArr, refs, width, height, onCardClick, computedSize.width, computedSize.height]
   );
 
   return (

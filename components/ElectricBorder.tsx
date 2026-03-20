@@ -24,7 +24,7 @@ const ElectricBorder: React.FC<ElectricBorderProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
   const timeRef = useRef(0);
   const lastFrameTimeRef = useRef(0);
 

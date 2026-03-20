@@ -4,18 +4,66 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function RegisterPage() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  
   const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.setItem('isLoggedIn', 'true');
-    window.dispatchEvent(new Event('auth-change'));
-    router.push('/');
+    setLoading(true);
+    setError(null);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            full_name: `${formData.firstName} ${formData.lastName}`
+          }
+        }
+      });
+
+      if (signUpError) throw signUpError;
+
+      if (data?.user) {
+        // Successfully signed up
+        localStorage.setItem('isLoggedIn', 'true');
+        window.dispatchEvent(new Event('auth-change'));
+        router.push('/');
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -29,13 +77,13 @@ export default function RegisterPage() {
         <div className="absolute top-0 left-0 right-0 h-1/4 bg-gradient-to-b from-black to-transparent z-10" />
 
         {/* Logo */}
-        <div className="relative z-20 flex flex-col items-center">
+        <div className="relative z-20 flex flex-col items-center mix-blend-screen">
           <Image
             src="/elite-logo.png"
             alt="Elite Trader Logo"
             width={300}
             height={300}
-            className="object-contain drop-shadow-[0_0_60px_rgba(212,175,55,0.4)] mix-blend-screen"
+            className="object-contain"
             priority
           />
           <div className="mt-8 text-center">
@@ -74,7 +122,7 @@ export default function RegisterPage() {
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold-500/40 to-transparent" />
 
         {/* Mobile logo */}
-        <div className="lg:hidden flex justify-center mb-10">
+        <div className="lg:hidden flex justify-center mb-10 mix-blend-screen">
           <Image src="/elite-logo.png" alt="Elite Trader" width={100} height={100} className="object-contain" />
         </div>
 
@@ -90,6 +138,11 @@ export default function RegisterPage() {
               Sign in
             </Link>
           </p>
+          {error && (
+            <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+              {error}
+            </div>
+          )}
         </div>
 
         {/* Form */}
@@ -102,6 +155,10 @@ export default function RegisterPage() {
               </label>
               <input
                 type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                required
                 placeholder="John"
                 className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-4 text-white placeholder-slate-600 focus:outline-none focus:border-gold-500/60 focus:bg-white/[0.05] transition-all text-sm"
               />
@@ -112,6 +169,10 @@ export default function RegisterPage() {
               </label>
               <input
                 type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                required
                 placeholder="Doe"
                 className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-4 text-white placeholder-slate-600 focus:outline-none focus:border-gold-500/60 focus:bg-white/[0.05] transition-all text-sm"
               />
@@ -125,6 +186,10 @@ export default function RegisterPage() {
             </label>
             <input
               type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
               placeholder="you@example.com"
               className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-4 text-white placeholder-slate-600 focus:outline-none focus:border-gold-500/60 focus:bg-white/[0.05] transition-all text-sm"
             />
@@ -138,6 +203,10 @@ export default function RegisterPage() {
             <div className="relative">
               <input
                 type={showPass ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
                 placeholder="Min. 8 characters"
                 className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-4 text-white placeholder-slate-600 focus:outline-none focus:border-gold-500/60 focus:bg-white/[0.05] transition-all text-sm pr-12"
               />
@@ -155,6 +224,10 @@ export default function RegisterPage() {
             <div className="relative">
               <input
                 type={showConfirm ? 'text' : 'password'}
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                required
                 placeholder="Re-enter password"
                 className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-4 text-white placeholder-slate-600 focus:outline-none focus:border-gold-500/60 focus:bg-white/[0.05] transition-all text-sm pr-12"
               />
@@ -178,10 +251,17 @@ export default function RegisterPage() {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full mt-1 py-4 rounded-xl bg-gold-500 hover:bg-gold-400 text-black font-bold text-sm tracking-widest uppercase transition-all shadow-[0_0_30px_rgba(212,175,55,0.25)] hover:shadow-[0_0_40px_rgba(212,175,55,0.4)] flex items-center justify-center gap-2 group"
+            disabled={loading}
+            className={`w-full mt-1 py-4 rounded-xl bg-gold-500 hover:bg-gold-400 text-black font-bold text-sm tracking-widest uppercase transition-all shadow-[0_0_30px_rgba(212,175,55,0.25)] hover:shadow-[0_0_40px_rgba(212,175,55,0.4)] flex items-center justify-center gap-2 group ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Create Account
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            {loading ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <>
+                Create Account
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </>
+            )}
           </button>
 
           {/* Divider */}
