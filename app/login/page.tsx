@@ -30,6 +30,16 @@ export default function LoginPage() {
       if (signInError) throw signInError;
 
       if (data?.user) {
+        // Send email notification (fire and forget)
+        fetch('/api/auth/login-notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email: data.user.email,
+            firstName: data.user.user_metadata?.first_name || 'Trader'
+          }),
+        }).catch(err => console.error('Notification failed:', err));
+
         localStorage.setItem('isLoggedIn', 'true');
         window.dispatchEvent(new Event('auth-change'));
         router.push('/');
