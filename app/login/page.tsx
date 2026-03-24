@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/utils/supabase/client';
 
 export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
@@ -13,6 +13,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  
+  const supabase = createClient();
   
   const router = useRouter();
 
@@ -45,7 +47,11 @@ export default function LoginPage() {
         router.push('/');
       }
     } catch (err: any) {
-      setError(err.message);
+      if (err.message?.includes('Email not confirmed')) {
+        setError('Please check your inbox and verify your email address before signing in.');
+      } else {
+        setError(err.message || 'An error occurred during sign in.');
+      }
     } finally {
       setLoading(false);
     }

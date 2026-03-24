@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/utils/supabase/client';
 import { User, LogOut, ChevronDown } from 'lucide-react';
 import './PillNav.css';
+
+const supabase = createClient();
 
 const PillNav = ({
   logo = '/elite-logo.png',
@@ -298,10 +300,10 @@ const PillNav = ({
                 <div className="relative flex items-center gap-3">
                   <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center text-black font-bold text-xs uppercase">
-                      {user.user_metadata?.first_name?.[0] || user.email?.[0] || 'U'}
+                      {user.user_metadata?.first_name?.[0] || user.user_metadata?.full_name?.[0] || user.user_metadata?.name?.[0] || user.email?.[0] || 'U'}
                     </div>
                     <span className="text-[13px] font-bold text-white uppercase tracking-widest hidden xl:block">
-                      {user.user_metadata?.first_name || 'Trader'}
+                      {user.user_metadata?.first_name || user.user_metadata?.full_name?.split(' ')[0] || user.user_metadata?.name?.split(' ')[0] || 'Trader'}
                     </span>
                   </div>
                   <button 
@@ -352,12 +354,12 @@ const PillNav = ({
               {user ? (
                   <>
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center text-black font-bold text-lg">
-                        {user.user_metadata?.first_name?.[0] || user.email?.[0]}
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center text-black font-bold text-lg uppercase">
+                        {user.user_metadata?.first_name?.[0] || user.user_metadata?.full_name?.[0] || user.user_metadata?.name?.[0] || user.email?.[0] || 'U'}
                       </div>
                       <div>
                         <p className="text-white font-bold text-lg leading-none uppercase">
-                          {user.user_metadata?.first_name || 'Member'}
+                          {user.user_metadata?.first_name || user.user_metadata?.full_name?.split(' ')[0] || user.user_metadata?.name?.split(' ')[0] || 'Member'}
                         </p>
                         <p className="text-slate-500 text-xs mt-1 lowercase">
                           {user.email}

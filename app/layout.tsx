@@ -4,7 +4,7 @@ import "./globals.css";
 import ClickSpark from "@/components/ClickSpark";
 import CommunityPopup from "@/components/CommunityPopup";
 import SplashLoader from "@/components/SplashLoader";
-import ChatBot from "@/components/ChatBot";
+import CryptoChatWidget from '@/components/CryptoChatWidget';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,7 +43,7 @@ export default function RootLayout({
       >
         <SplashLoader />
         <CommunityPopup />
-        <ChatBot />
+        <CryptoChatWidget />
         <ClickSpark>
           {children}
         </ClickSpark>
