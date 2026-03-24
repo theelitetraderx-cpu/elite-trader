@@ -5,7 +5,7 @@ import { createClient as createSupabaseClient } from './utils/supabase/middlewar
 // Basic in-memory rate limiting map.
 const rateLimitMap = new Map();
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for') ?? request.headers.get('x-real-ip') ?? '127.0.0.1';
   const userAgent = request.headers.get('user-agent') || '';
 
@@ -51,8 +51,9 @@ export function middleware(request: NextRequest) {
   }
 
   // 3. Supabase SSR Session refresh
-  const supabaseResponse = createSupabaseClient(request);
-  return supabaseResponse;
+  // We MUST await this to ensure the auth token is refreshed and cookies are set.
+  const response = await createSupabaseClient(request);
+  return response;
 }
 
 export const config = {
