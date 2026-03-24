@@ -299,10 +299,10 @@ const PillNav = ({
             {user ? (
                 <div className="relative flex items-center gap-3">
                   <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center text-black font-bold text-xs uppercase">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center text-black font-bold text-xs uppercase shadow-[0_0_15px_rgba(212,175,55,0.3)]">
                       {user.user_metadata?.first_name?.[0] || user.user_metadata?.full_name?.[0] || user.user_metadata?.name?.[0] || user.email?.[0] || 'U'}
                     </div>
-                    <span className="text-[13px] font-bold text-white uppercase tracking-widest hidden xl:block">
+                    <span className="text-[13px] font-bold text-white uppercase tracking-widest sm:block">
                       {user.user_metadata?.first_name || user.user_metadata?.full_name?.split(' ')[0] || user.user_metadata?.name?.split(' ')[0] || 'Trader'}
                     </span>
                   </div>
