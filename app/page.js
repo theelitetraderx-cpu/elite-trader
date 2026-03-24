@@ -1,11 +1,11 @@
-import Navbar from './../components/Navbar';
-import Hero from './../components/Hero';
-import Courses from './../components/Courses';
-import CommunitySection from './../components/CommunitySection';
-import Benefits from './../components/Benefits';
-import Pricing from './../components/Pricing';
-import Features from './../components/Features';
-import Footer from './../components/Footer';
+import Navbar from '@/components/Navbar';
+import Hero from '@/components/Hero';
+import Courses from '@/components/Courses';
+import CommunitySection from '@/components/CommunitySection';
+import Benefits from '@/components/Benefits';
+import Pricing from '@/components/Pricing';
+import Features from '@/components/Features';
+import Footer from '@/components/Footer';
 
 export default function Home() {
   return (
