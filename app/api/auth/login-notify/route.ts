@@ -1,7 +1,8 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend only if the API key is provided; otherwise, set to null to avoid runtime errors during build.
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export async function POST(request: Request) {
   try {
@@ -11,6 +12,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
+    if (!resend) {
+      return NextResponse.json({ error: 'Resend API key is not configured.' }, { status: 500 });
+    }
     const data = await resend.emails.send({
       from: 'Elite Trader <onboarding@resend.dev>',
       to: [email],
@@ -42,6 +46,12 @@ export async function POST(request: Request) {
 
     return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json({ error });
+    // If Resend was not initialized due to missing API key, provide a clear error message.
+    const errMsg = !process.env.RESEND_API_KEY
+      ? 'Resend API key is not configured. Set RESEND_API_KEY in environment variables.'
+      : error instanceof Error
+      ? error.message
+      : 'An unknown error occurred.';
+    return NextResponse.json({ error: errMsg }, { status: 500 });
   }
 }
