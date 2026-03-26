@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
 import BorderGlow from "./BorderGlow";
+import Link from "next/link";
 
 export default function Pricing() {
   const [expandedIndex, setExpandedIndex] = useState(null);
@@ -137,12 +138,15 @@ export default function Pricing() {
                     </div>
 
                   </div>
-                  <a href="https://t.me/Elitefuturetrades" target="_blank" className={`w-full mt-auto py-4 rounded-xl font-medium transition-all text-center block ${plan.featured
+                  <Link 
+                    href={`/enrol?plan=${encodeURIComponent(plan.size)}&price=${encodeURIComponent(plan.price)}`} 
+                    className={`w-full mt-auto py-4 rounded-xl font-medium transition-all text-center block ${plan.featured
                     ? 'bg-gold-500 hover:bg-gold-400 text-black shadow-[0_0_20px_rgba(212,175,55,0.3)] font-bold'
                     : 'bg-[#151515] hover:bg-[#202020] text-gold-500 border border-gold-500/30'
-                    }`}>
+                    }`}
+                  >
                     Enroll in {plan.size}
-                  </a>
+                  </Link>
                 </div>
               </BorderGlow>
             </div>
