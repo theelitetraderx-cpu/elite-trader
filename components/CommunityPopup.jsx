@@ -66,7 +66,8 @@ export default function CommunityPopup() {
             {/* Header / Close */}
             <button 
               onClick={closePopup}
-              className="absolute top-8 right-8 p-2 rounded-full bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all z-20"
+              className="absolute top-6 right-6 md:top-8 md:right-8 p-2.5 md:p-2 rounded-full bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all z-20"
+              aria-label="Close popup"
             >
               <X className="w-6 h-6" />
             </button>

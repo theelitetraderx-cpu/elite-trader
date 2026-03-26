@@ -27,11 +27,11 @@ export default function Hero() {
             
                 {/* Hero Text */}
                 <div className="text-center max-w-4xl mx-auto mb-16">
-                   <h1 className="text-5xl md:text-6xl lg:text-7xl font-medium tracking-tight text-white mb-6 reveal">
-                      Trade With <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-600">Precision.</span><br/>
-                      Execute With <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-600">Discipline.</span>
-                   </h1>
-                   <p className="text-slate-400 text-xl max-w-2xl mx-auto mb-10 leading-relaxed reveal reveal-delayed-1">
+                    <h1 className="text-[clamp(2.5rem,8vw,4.5rem)] font-medium tracking-tight text-white mb-6 reveal leading-[1.1]">
+                       Trade With <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-600">Precision.</span><br/>
+                       Execute With <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-600">Discipline.</span>
+                    </h1>
+                    <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed reveal reveal-delayed-1">
                       The Elite Trader is built on structured setups, risk management, and long-term consistency.
                    </p>
                   

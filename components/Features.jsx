@@ -21,21 +21,21 @@ export default function Features() {
              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gold-500/20 bg-gold-500/5 text-gold-500 text-xs font-bold uppercase tracking-widest mb-6">
                 Course Content System
              </div>
-             <h3 className="text-4xl md:text-5xl font-medium text-white mb-6 tracking-tight">
+             <h3 className="text-3xl md:text-5xl font-medium text-white mb-6 tracking-tight">
                Built on a modern <br className="hidden md:block"/>learning ecosystem.
              </h3>
-             <p className="text-lg text-slate-400 leading-relaxed mb-12">
+             <p className="text-base md:text-lg text-slate-400 leading-relaxed mb-12">
                Our educational platform is designed to provide high-quality trade breakdowns, live sessions, and a structured path to mastering futures markets.
              </p>
 
-             <div className="space-y-6">
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-8">
                {features.map((f, i) => (
                  <div key={i} className="flex gap-5 group">
                    <div className="flex-shrink-0 w-12 h-12 bg-[#0a0a0a] border border-white/5 rounded-2xl flex items-center justify-center group-hover:bg-[#151515] group-hover:border-gold-500/30 transition-colors shadow-[0_0_15px_rgba(0,0,0,0.3)]">
                      {f.icon}
                    </div>
                    <div>
-                     <h4 className="text-lg font-medium text-white mb-1">{f.title}</h4>
+                     <h4 className="text-lg font-medium text-white mb-1 leading-snug">{f.title}</h4>
                      <p className="text-slate-400 leading-relaxed max-w-md text-sm">{f.desc}</p>
                    </div>
                  </div>

@@ -260,7 +260,7 @@ const PillNav = ({
           <img src={logo} alt={logoAlt} ref={logoImgRef} />
         </Link>
 
-        <div className="pill-nav-items desktop-only" ref={navItemsRef}>
+        <div className="pill-nav-items" ref={navItemsRef}>
           <ul className="pill-list" role="menubar">
             {items.map((item, i) => {
               const active = isActive(item.href);
@@ -295,7 +295,7 @@ const PillNav = ({
         </div>
 
         {/* Desktop Actions */}
-        <div className="desktop-only flex items-center gap-4 ml-2">
+        <div className="desktop-actions ml-2">
             {user ? (
                 <div className="relative flex items-center gap-3">
                   <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group">
@@ -327,7 +327,7 @@ const PillNav = ({
         </div>
 
         <button
-          className="mobile-menu-button mobile-only"
+          className="mobile-menu-button"
           onClick={toggleMobileMenu}
           aria-label="Toggle menu"
           ref={hamburgerRef}
@@ -337,7 +337,7 @@ const PillNav = ({
         </button>
       </nav>
 
-      <div className="mobile-menu-popover mobile-only" ref={mobileMenuRef}>
+      <div className="mobile-menu-popover" ref={mobileMenuRef}>
         <ul className="mobile-menu-list">
           {items.map((item, i) => (
             <li key={item.href || `mobile-item-${i}`}>

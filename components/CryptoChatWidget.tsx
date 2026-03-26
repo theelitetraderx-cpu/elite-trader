@@ -32,7 +32,7 @@ export default function CryptoChatWidget() {
 
       {/* Chat Window */}
       <div 
-        className={`fixed bottom-24 right-6 z-50 w-[350px] sm:w-[400px] h-[550px] bg-black/95 backdrop-blur-xl border border-gold-500/20 rounded-2xl shadow-2xl overflow-hidden flex flex-col transform transition-all duration-300 origin-bottom-right ${
+        className={`fixed bottom-24 right-4 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[400px] h-[550px] max-w-[400px] bg-black/95 backdrop-blur-xl border border-gold-500/20 rounded-2xl shadow-2xl overflow-hidden flex flex-col transform transition-all duration-300 origin-bottom-right ${
           isOpen ? 'scale-100 opacity-100 pointer-events-auto' : 'scale-95 opacity-0 pointer-events-none'
         }`}
       >

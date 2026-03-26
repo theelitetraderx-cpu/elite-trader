@@ -77,7 +77,7 @@ export default function Pricing() {
   return (
     <section id="pricing" className="bg-black py-20 md:py-32 relative border-t border-white/5">
       {/* Background glow effects */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[600px] bg-gold-600/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-full md:max-w-3xl h-[600px] bg-gold-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 

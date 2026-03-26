@@ -24,6 +24,12 @@
     rgba(0, 0, 0, 0.1) 0px 32px 64px;
 }
 
+@media (max-width: 640px) {
+  .border-glow-card {
+    --glow-padding: 20px;
+  }
+}
+
 .border-glow-card::before,
 .border-glow-card::after,
 .border-glow-card > .edge-light {
