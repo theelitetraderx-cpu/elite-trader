@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import PhoneInput from '@/components/PhoneInput';
 
 export default function RegisterPage() {
   const [showPass, setShowPass] = useState(false);
@@ -18,6 +19,7 @@ export default function RegisterPage() {
     firstName: '',
     lastName: '',
     email: '',
+    phone: '+91 ',
     password: '',
     confirmPassword: ''
   });
@@ -48,7 +50,8 @@ export default function RegisterPage() {
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
-            full_name: `${formData.firstName} ${formData.lastName}`
+            full_name: `${formData.firstName} ${formData.lastName}`,
+            phone_number: formData.phone
           }
         }
       });
@@ -195,7 +198,6 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {/* Email */}
           <div>
             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
               Email Address
@@ -210,6 +212,13 @@ export default function RegisterPage() {
               className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-4 text-white placeholder-slate-600 focus:outline-none focus:border-gold-500/60 focus:bg-white/[0.05] transition-all text-sm"
             />
           </div>
+
+          {/* Phone Number */}
+          <PhoneInput 
+            value={formData.phone}
+            onChange={(val) => setFormData(prev => ({ ...prev, phone: val }))}
+            required={true}
+          />
 
           {/* Password */}
           <div>

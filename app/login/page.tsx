@@ -4,14 +4,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Loader2, Phone, Mail } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import PhoneInput from '@/components/PhoneInput';
 
 export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('+91 ');
   const [password, setPassword] = useState('');
   
   const supabase = createClient();
@@ -33,14 +35,16 @@ export default function LoginPage() {
 
       if (data?.user) {
         // Send email notification (fire and forget)
-        fetch('/api/auth/login-notify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            email: data.user.email,
-            firstName: data.user.user_metadata?.first_name || 'Trader'
-          }),
-        }).catch(err => console.error('Notification failed:', err));
+        if (data.user.email) {
+          fetch('/api/auth/login-notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              email: data.user.email,
+              firstName: data.user.user_metadata?.first_name || 'Trader'
+            }),
+          }).catch(err => console.error('Notification failed:', err));
+        }
 
         localStorage.setItem('isLoggedIn', 'true');
         window.dispatchEvent(new Event('auth-change'));
@@ -163,6 +167,13 @@ export default function LoginPage() {
               className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-4 text-white placeholder-slate-600 focus:outline-none focus:border-gold-500/60 focus:bg-white/[0.05] transition-all text-sm"
             />
           </div>
+
+          {/* Phone Number */}
+          <PhoneInput 
+            value={phone}
+            onChange={(val: string) => setPhone(val)}
+            required={true}
+          />
 
           {/* Password */}
           <div>

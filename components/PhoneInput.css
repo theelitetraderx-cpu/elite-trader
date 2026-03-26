@@ -1,0 +1,156 @@
+.phone-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.phone-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8; /* slate-400 */
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.phone-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.phone-input-wrapper:focus-within {
+  border-color: rgba(212, 175, 55, 0.6);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.2);
+}
+
+.country-selector {
+  position: relative;
+  height: 100%;
+}
+
+.country-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 0 16px;
+  height: 52px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.country-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.country-button .flag {
+  font-size: 1.2rem;
+}
+
+.country-button .code {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #d4af37; /* gold-400 */
+}
+
+.country-button .chevron {
+  color: #64748b;
+  transition: transform 0.2s;
+}
+
+.country-button .chevron.open {
+  transform: rotate(180deg);
+}
+
+.country-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 240px;
+  max-height: 280px;
+  background: #0f0f0f;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  z-index: 100;
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.country-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.country-option:hover {
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.country-option.active {
+  background: rgba(212, 175, 55, 0.15);
+}
+
+.country-option .flag {
+  font-size: 1.1rem;
+}
+
+.country-option .name {
+  flex: 1;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+}
+
+.country-option .code {
+  font-size: 0.75rem;
+  color: #d4af37;
+  font-weight: 500;
+}
+
+.phone-field {
+  flex: 1;
+  height: 52px;
+  padding: 0 16px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.phone-field::placeholder {
+  color: #475569; /* slate-600 */
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.5);
+}
