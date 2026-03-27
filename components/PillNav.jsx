@@ -18,7 +18,7 @@ const PillNav = ({
     { label: 'Courses', href: '/#courses' },
     { label: 'Pricing', href: 'https://t.me/Elitefuturetrades' },
     { label: 'Community', href: '/community' },
-    { label: 'About', href: '/about' }
+    { label: 'Dashboard', href: '/dashboard', authRequired: true }
   ],
   className = '',
   ease = 'power3.out',
@@ -246,6 +246,7 @@ const PillNav = ({
     if (href === '/') return pathname === '/';
     return pathname.startsWith(href) || (currentHash && href.includes(currentHash));
   };
+  const navItems = items.filter(item => !item.authRequired || (item.authRequired && user));
 
   return (
     <div className={`pill-nav-container ${className}`}>
@@ -262,7 +263,7 @@ const PillNav = ({
 
         <div className="pill-nav-items" ref={navItemsRef}>
           <ul className="pill-list" role="menubar">
-            {items.map((item, i) => {
+            {navItems.map((item, i) => {
               const active = isActive(item.href);
               return (
                 <li key={item.href || `item-${i}`} role="none">
@@ -339,7 +340,7 @@ const PillNav = ({
 
       <div className="mobile-menu-popover" ref={mobileMenuRef}>
         <ul className="mobile-menu-list">
-          {items.map((item, i) => (
+          {navItems.map((item, i) => (
             <li key={item.href || `mobile-item-${i}`}>
               <Link
                 href={item.href}

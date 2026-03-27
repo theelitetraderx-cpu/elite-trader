@@ -1,0 +1,175 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { User, Users, Share2, LogOut, ShieldCheck, Settings, Bell, ChevronRight } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import BorderGlow from "@/components/BorderGlow";
+import ProfileSection from "@/components/dashboard/ProfileSection";
+import FriendsSection from "@/components/dashboard/FriendsSection";
+import NetworkCircles from "@/components/dashboard/NetworkCircles";
+
+const supabase = createClient();
+
+export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState("profile");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    async function checkUser() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/login");
+        return;
+      }
+      setUser(session.user);
+      setLoading(false);
+    }
+    checkUser();
+  }, [router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-gold-500/20 border-t-gold-500 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  const tabs = [
+    { id: "profile", label: "Profile", icon: User },
+    { id: "friends", label: "Friends", icon: Users },
+  ];
+
+  return (
+    <div className="bg-black min-h-screen text-slate-200 font-sans selection:bg-gold-500 selection:text-black scroll-smooth overflow-x-hidden">
+      <Navbar />
+      
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 relative z-10">
+        
+        {/* Dashboard Header */}
+        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h1 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter mb-2">
+              Trader <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-600">Dashboard</span>
+            </h1>
+            <p className="text-slate-400 font-medium">Manage your elite trading profile and rewards.</p>
+          </motion.div>
+          
+          <div className="flex items-center gap-3">
+            <button className="p-3 rounded-2xl bg-white/[0.03] border border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.08] transition-all relative">
+              <Bell size={20} />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-gold-500 rounded-full animate-pulse"></span>
+            </button>
+            <button className="p-3 rounded-2xl bg-white/[0.03] border border-white/10 text-slate-400 hover:text-white hover:bg-white/[0.08] transition-all">
+              <Settings size={20} />
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Side Tabs - Sidebar on Desktop, Horizontal Scroll on Mobile */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-3 lg:space-y-2 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 no-scrollbar items-center lg:items-stretch"
+          >
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex-shrink-0 lg:w-full flex items-center justify-between p-3 lg:p-4 rounded-2xl transition-all group ${
+                    isActive 
+                    ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-black shadow-lg shadow-gold-500/20' 
+                    : 'bg-white/[0.02] border border-white/5 text-slate-400 hover:bg-white/[0.05] hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-xl ${isActive ? 'bg-black/10' : 'bg-white/5 group-hover:bg-white/10'}`}>
+                      <Icon size={18} />
+                    </div>
+                    <span className="font-bold uppercase tracking-widest text-[11px] lg:text-[13px] whitespace-nowrap">{tab.label}</span>
+                  </div>
+                  <ChevronRight size={16} className={`hidden lg:block ${isActive ? 'opacity-100' : 'opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'} transition-all`} />
+                </button>
+              );
+            })}
+
+            <div className="hidden lg:block mt-8 pt-8 border-t border-white/5">
+              <div className="p-5 rounded-3xl bg-gold-500/5 border border-gold-500/10 mb-4">
+                <div className="flex items-center gap-2 text-gold-500 text-[10px] font-bold uppercase tracking-widest mb-2">
+                  <ShieldCheck size={12} /> Security Level: High
+                </div>
+                <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: '85%' }}
+                    className="h-full bg-gold-500"
+                  ></motion.div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Main Content Area */}
+          <div className="lg:col-span-9">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <BorderGlow
+                  borderRadius={32}
+                  backgroundColor="#0a0a0a"
+                  glowColor="40 80 80"
+                  colors={['#d4af37', '#ffd700', '#aa8a2e']}
+                  glowIntensity={0.5}
+                  fillOpacity={0}
+                >
+                  <div className="min-h-[500px]">
+                    {activeTab === "profile" && <ProfileSection user={user} />}
+                    {activeTab === "friends" && <FriendsSection user={user} />}
+                  </div>
+                </BorderGlow>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+        </div>
+
+        {/* Bottom Social Proof Section */}
+        <div className="mt-32 pt-20 border-t border-white/5">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">
+              Our Growing <span className="text-gold-500">Network</span>
+            </h2>
+            <p className="text-slate-400 max-w-xl mx-auto">You're part of an elite community of traders globally. Connect, grow, and dominate the markets together.</p>
+          </div>
+          
+          <div className="relative h-[600px] w-full">
+            <NetworkCircles />
+          </div>
+        </div>
+
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
