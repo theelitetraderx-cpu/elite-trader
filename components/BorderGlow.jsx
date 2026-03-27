@@ -54,14 +54,14 @@ const BorderGlow = ({
   className = '',
   edgeSensitivity = 30,
   glowColor = '40 80 80',
-  backgroundColor = '#0a0a0a',
-  borderRadius = 24,
+  backgroundColor = '#060010',
+  borderRadius = 28,
   glowRadius = 40,
   glowIntensity = 1.0,
   coneSpread = 25,
   animated = false,
-  colors = ['#d4af37', '#ffd700', '#b8860b'],
-  fillOpacity = 0.4,
+  colors = ['#c084fc', '#f472b6', '#38bdf8'],
+  fillOpacity = 0.5,
 }) => {
   const cardRef = useRef(null);
 
@@ -95,11 +95,14 @@ const BorderGlow = ({
   const handlePointerMove = useCallback((e) => {
     const card = cardRef.current;
     if (!card) return;
+
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+
     const edge = getEdgeProximity(card, x, y);
     const angle = getCursorAngle(card, x, y);
+
     card.style.setProperty('--edge-proximity', `${(edge * 100).toFixed(3)}`);
     card.style.setProperty('--cursor-angle', `${angle.toFixed(3)}deg`);
   }, [getEdgeProximity, getCursorAngle]);
@@ -111,6 +114,7 @@ const BorderGlow = ({
     const angleEnd = 465;
     card.classList.add('sweep-active');
     card.style.setProperty('--cursor-angle', `${angleStart}deg`);
+
     animateValue({ duration: 500, onUpdate: v => card.style.setProperty('--edge-proximity', v) });
     animateValue({ ease: easeInCubic, duration: 1500, end: 50, onUpdate: v => {
       card.style.setProperty('--cursor-angle', `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);

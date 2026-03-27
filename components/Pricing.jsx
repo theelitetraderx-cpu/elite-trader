@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
+import { PLANS } from "@/lib/plans";
 import BorderGlow from "./BorderGlow";
 import Link from "next/link";
 
@@ -11,69 +12,8 @@ export default function Pricing() {
   const toggleDetails = (index) => {
     setExpandedIndex(expandedIndex === index ? null : index);
   };
-  const plans = [
-    {
-      size: "Foundation",
-      price: "$49",
-      target: "Core Fundamentals",
-      features: [
-        "What is Trading?",
-        "Types of Trading (Scalping, Intraday, Swing, Futures)",
-        "Core Trading Concepts (Market structure, support & resistance, trend)",
-        "Risk Management Basics",
-        "Trading Psychology Fundamentals",
-        "Apps & Platforms to Trade (Binance & TradingView setup)",
-        "How to place your first basic trade",
-        "Community Access"
-      ],
-      featured: false,
-      glowColor: "43 74 49",
-      colors: ['#d4af37', '#ffd700', '#b8860b'],
-    },
-    {
-      size: "Pro Master",
-      price: "$249",
-      target: "Complete Futures Mastery",
-      features: [
-        "Everything in Foundation, plus:",
-        "What is Binance? Full platform walkthrough",
-        "Spot vs Futures explained clearly",
-        "Why we trade Futures",
-        "Understanding Leverage",
-        "Margin Types (Cross vs Isolated)",
-        "Funding Fees explained",
-        "Liquidation mechanics",
-        "Risk:Reward optimization",
-        "Position sizing strategy",
-        "Live trade breakdown examples",
-        "Weekly analysis sessions",
-        "Private Pro community access"
-      ],
-      featured: true,
-      glowColor: "43 74 49",
-      colors: ['#ffd700', '#d4af37', '#b8860b'],
-    },
-    {
-      size: "Elite",
-      price: "$499",
-      target: "Advanced Mentorship",
-      features: [
-        "Everything in Foundation + Pro, plus:",
-        "Step-by-step guidance to place your first Futures trade on Binance",
-        "Personal capital allocation advice",
-        "1-on-1 Mentorship Sessions (Twice per month)",
-        "Personalized trade review & feedback",
-        "Weekly coins provided for analysis practice",
-        "Direct support for execution clarity",
-        "Advanced psychology & discipline framework",
-        "Performance tracking system",
-        "Private Elite access"
-      ],
-      featured: false,
-      glowColor: "43 74 49",
-      colors: ['#d4af37', '#ffd700', '#b8860b'],
-    }
-  ];
+  
+  const plans = PLANS;
 
   return (
     <section id="pricing" className="bg-black py-20 md:py-32 relative border-t border-white/5">
@@ -106,6 +46,7 @@ export default function Pricing() {
                 glowColor={plan.glowColor}
                 colors={plan.colors}
                 glowIntensity={plan.featured ? 1.2 : 0.9}
+                fillOpacity={0}
                 className={plan.featured ? 'shadow-[0_0_60px_rgba(212,175,55,0.15)] h-full w-full block' : 'h-full w-full block'}
               >
                 <div className="p-6 md:p-8 h-full flex flex-col justify-between">
@@ -113,7 +54,7 @@ export default function Pricing() {
                     <div className="text-gold-400 text-sm font-medium mb-3 uppercase tracking-widest flex items-center gap-2">
                       <div className={`w-1.5 h-1.5 rounded-full ${plan.featured ? 'bg-gold-300 shadow-[0_0_5px_#ffd700]' : 'bg-slate-500'} `}></div> {plan.target}
                     </div>
-                    <div className="text-3xl md:text-4xl font-light text-white mb-6 tracking-tight">{plan.size}</div>
+                    <div className="text-3xl md:text-4xl font-light text-white mb-6 tracking-tight">{plan.name}</div>
 
                     <div className="flex items-baseline gap-2 mb-8 pb-8 border-b border-white/5">
                       <div className="text-4xl md:text-5xl font-medium text-white">{plan.price}</div>
@@ -139,13 +80,13 @@ export default function Pricing() {
 
                   </div>
                   <Link 
-                    href={`/enrol?plan=${encodeURIComponent(plan.size)}&price=${encodeURIComponent(plan.price)}`} 
+                    href={`/enrol?plan=${encodeURIComponent(plan.name)}&price=${encodeURIComponent(plan.price)}`} 
                     className={`w-full mt-auto py-4 rounded-xl font-medium transition-all text-center block ${plan.featured
                     ? 'bg-gold-500 hover:bg-gold-400 text-black shadow-[0_0_20px_rgba(212,175,55,0.3)] font-bold'
                     : 'bg-[#151515] hover:bg-[#202020] text-gold-500 border border-gold-500/30'
                     }`}
                   >
-                    Enroll in {plan.size}
+                    Enroll in {plan.name}
                   </Link>
                 </div>
               </BorderGlow>
