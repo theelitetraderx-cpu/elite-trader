@@ -52,7 +52,8 @@ export async function middleware(request: NextRequest) {
 
   // 3. Supabase SSR Session refresh
   // We MUST await this to ensure the auth token is refreshed and cookies are set.
-  const response = await createSupabaseClient(request);
+  const { supabase, response } = await createSupabaseClient(request);
+
   return response;
 }
 

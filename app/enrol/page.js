@@ -11,6 +11,7 @@ import Footer from '@/components/Footer';
 import BorderGlow from '@/components/BorderGlow';
 
 import { PLANS } from '@/lib/plans';
+import PaymentNotificationForm from '@/components/PaymentNotificationForm';
 
 function EnrolContent() {
   const searchParams = useSearchParams();
@@ -180,6 +181,7 @@ function EnrolContent() {
             </motion.div>
 
             {/* Crypto Payment Section */}
+            {/* Crypto Payment Section */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -259,10 +261,16 @@ function EnrolContent() {
               <div className="mt-8 p-4 rounded-xl bg-gold-500/5 border border-gold-500/10 flex items-start gap-4">
                 <ShieldCheck className="text-gold-400 shrink-0 mt-0.5" size={18} />
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  <span className="text-gold-400 font-bold uppercase tracking-wider">Note:</span> Please ensure you select the correct network in your wallet before sending funds. Incorrect network transfers may result in permanent loss of funds. After payment, send a screenshot to support.
+                  <span className="text-gold-400 font-bold uppercase tracking-wider">Note:</span> Please ensure you select the correct network in your wallet before sending funds. Incorrect network transfers may result in permanent loss of funds. After payment, submit your details below.
                 </p>
               </div>
             </motion.div>
+
+            {/* Payment Notification Form */}
+            <PaymentNotificationForm 
+              planName={selectedPlan.name} 
+              planPrice={planPrice} 
+            />
           </div>
 
           {/* Sidebar Info/Alternative */}

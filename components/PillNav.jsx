@@ -16,7 +16,7 @@ const PillNav = ({
   items = [
     { label: 'Home', href: '/' },
     { label: 'Courses', href: '/#courses' },
-    { label: 'Pricing', href: 'https://t.me/Elitefuturetrades' },
+    { label: 'Pricing', href: '/#pricing' },
     { label: 'Community', href: '/community' },
     { label: 'Dashboard', href: '/dashboard', authRequired: true }
   ],

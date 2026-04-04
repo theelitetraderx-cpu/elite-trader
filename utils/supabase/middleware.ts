@@ -39,6 +39,5 @@ export const createClient = async (request: NextRequest) => {
   // This is the CRITICAL STEP: Calling getUser() refreshes the session
   // If we don't call it, the session expires and login state is lost during SSR.
   await supabase.auth.getUser();
-
-  return response;
+  return { supabase, response };
 };

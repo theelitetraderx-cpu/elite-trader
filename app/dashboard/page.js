@@ -10,7 +10,9 @@ import Footer from "@/components/Footer";
 import BorderGlow from "@/components/BorderGlow";
 import ProfileSection from "@/components/dashboard/ProfileSection";
 import FriendsSection from "@/components/dashboard/FriendsSection";
+import PaymentsSection from "@/components/dashboard/PaymentsSection";
 import NetworkCircles from "@/components/dashboard/NetworkCircles";
+import { CreditCard } from "lucide-react";
 
 const supabase = createClient();
 
@@ -44,6 +46,7 @@ export default function Dashboard() {
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
     { id: "friends", label: "Friends", icon: Users },
+    { id: "payments", label: "Payments", icon: CreditCard },
   ];
 
   return (
@@ -145,6 +148,7 @@ export default function Dashboard() {
                   <div className="min-h-[500px]">
                     {activeTab === "profile" && <ProfileSection user={user} />}
                     {activeTab === "friends" && <FriendsSection user={user} />}
+                    {activeTab === "payments" && <PaymentsSection user={user} />}
                   </div>
                 </BorderGlow>
               </motion.div>
