@@ -26,6 +26,32 @@ const socialLinks = [
     color: "from-gold-500 to-yellow-400",
     shadow: "shadow-gold-500/20",
     hex: "#d4af37"
+  },
+  {
+    name: "Instagram",
+    description: "Follow our daily trading lifestyle, behind-the-scenes content, and market insights.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-8 h-8"
+      >
+        <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+      </svg>
+    ),
+    href: "https://instagram.com",
+    color: "from-gold-500 to-yellow-500",
+    shadow: "shadow-gold-500/20",
+    hex: "#d4af37"
   }
 ];
 
@@ -96,7 +122,7 @@ export default function CommunityPage() {
           </div>
 
           <h2 className="text-2xl md:text-3xl font-bold mb-12 tracking-tight">Join our Official Channels</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {socialLinks.map((link) => (
               <ElectricBorder 
                 key={link.name} 
