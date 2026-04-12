@@ -51,14 +51,19 @@ export default function Footer() {
 
         </div>
 
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-slate-600 text-xs text-center md:text-left">
+        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-slate-600 text-[10px] uppercase tracking-widest font-medium text-center md:text-left">
             © {new Date().getFullYear()} The Elite Trader. All rights reserved.
           </p>
-          <div className="flex gap-6 text-xs text-slate-500">
-             <Link href="#" className="hover:text-slate-300 transition-colors">Privacy Policy</Link>
-             <Link href="#" className="hover:text-slate-300 transition-colors">Terms of Service</Link>
-             <Link href="#" className="hover:text-slate-300 transition-colors">Refund Policy</Link>
+          
+          <p className="text-slate-500 text-[10px] uppercase tracking-[0.2em] font-bold text-center">
+            Built by <span className="text-gold-500 hover:text-white transition-colors cursor-default">H2T Technologies</span> — <span className="text-slate-600 font-medium italic">Let’s Create Something Bold</span>
+          </p>
+
+          <div className="flex gap-6 text-[10px] uppercase tracking-widest font-bold text-slate-500">
+             <Link href="#" className="hover:text-gold-500 transition-colors">Privacy Policy</Link>
+             <Link href="#" className="hover:text-gold-500 transition-colors">Terms of Service</Link>
+             <Link href="#" className="hover:text-gold-500 transition-colors">Refund Policy</Link>
           </div>
         </div>
       </div>
