@@ -20,36 +20,50 @@ export default function PortalPage() {
       setLoading(true);
       
       try {
-        // Fallback Mock Data directly for now until DB tables are created
-        setCourses([
-           {
-              id: "c1",
-              title: "Futures Trading Masterclass",
-              description: "Learn precision entries and exits using advanced order flow and volume profile.",
-              is_locked: false,
-              plan_type: "basic",
-              total_lessons: 4,
-              completed_lessons: 0
-           },
-           {
-              id: "c2",
-              title: "Crypto Scalping Strategies",
-              description: "High frequency setups for volatile cryptocurrency pairs.",
-              is_locked: true,
-              plan_type: "premium",
-              total_lessons: 8,
-              completed_lessons: 0
-           },
-           {
-              id: "c3",
-              title: "Market Psychology & Risk",
-              description: "Protecting your capital and cultivating a sniper mindset.",
-              is_locked: true,
-              plan_type: "premium",
-              total_lessons: 5,
-              completed_lessons: 0
-           }
-        ]);
+        const { data: dbCourses, error } = await supabase
+          .from('courses')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        if (dbCourses && dbCourses.length > 0) {
+          setCourses(dbCourses.map(c => ({
+            ...c,
+            // Calculate completed lessons if needed, or leave at 0 for now
+            total_lessons: 0, // Should come from a join or separate query
+            completed_lessons: 0
+          })));
+        } else {
+          // Fallback Mock Data if table is empty
+          setCourses([
+             {
+                id: "c1",
+                title: "Futures Trading Masterclass",
+                description: "Learn precision entries and exits using advanced order flow and volume profile.",
+                is_locked: false,
+                plan_type: "basic",
+                total_lessons: 4,
+                completed_lessons: 0
+             },
+             {
+                id: "c2",
+                title: "Crypto Scalping Strategies",
+                description: "High frequency setups for volatile cryptocurrency pairs.",
+                is_locked: true,
+                plan_type: "premium",
+                total_lessons: 8,
+                completed_lessons: 0
+             },
+             {
+                id: "c3",
+                title: "Market Psychology & Risk",
+                description: "Protecting your capital and cultivating a sniper mindset.",
+                is_locked: true,
+                plan_type: "premium",
+                total_lessons: 5,
+                completed_lessons: 0
+             }
+          ]);
+        }
       } catch (e) {
          console.error(e);
       } finally {

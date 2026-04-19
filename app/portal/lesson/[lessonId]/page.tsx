@@ -8,6 +8,21 @@ import { Lock, FileText, Download, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePortal } from "@/components/portal/PortalProvider";
+import { createClient } from "@/utils/supabase/client";
+
+const supabase = createClient();
+
+interface Lesson {
+  id: string;
+  title: string;
+  description?: string;
+  desc?: string;
+  video_url: string;
+  videoUrl?: string;
+  is_locked?: boolean;
+  plan?: string;
+  completed?: boolean;
+}
 
 export default function LessonPage({ params }: { params: any }) {
   const resolvedParams: any = use(params);
@@ -15,69 +30,120 @@ export default function LessonPage({ params }: { params: any }) {
   const router = useRouter();
   const { isPaid, user, loading: authLoading } = usePortal();
 
-  // Local state for completed lessons array (Mock DB alternative)
+  const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
+  const [courseData, setCourseData] = useState<any>(null);
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // 1. Fetch Lesson Data & Progress
   useEffect(() => {
-     // Load completed lessons from Local Storage on mount
-     const localData = localStorage.getItem("elite_completed_lessons");
-     if (localData) {
-         setCompletedLessons(JSON.parse(localData));
-     }
-  }, []);
+    async function fetchLessonData() {
+      if (authLoading || !user) return;
+      setLoading(true);
 
-  const markLessonComplete = (id: string) => {
-      let newCompleted = [...completedLessons];
-      if (!newCompleted.includes(id)) {
-         newCompleted.push(id);
-         setCompletedLessons(newCompleted);
-         localStorage.setItem("elite_completed_lessons", JSON.stringify(newCompleted));
+      try {
+        // Fetch current lesson from DB
+        const { data: dbLesson, error: lError } = await supabase
+          .from('lessons')
+          .select('*, courses(*, lessons(*))')
+          .eq('id', lessonId)
+          .single();
+
+        // Fetch user progress from DB
+        const { data: progressData } = await supabase
+          .from('lesson_progress')
+          .select('lesson_id')
+          .eq('user_id', user.id);
+        
+        const dbCompletedIds = progressData?.map(p => p.lesson_id) || [];
+
+        if (dbLesson) {
+          setActiveLesson({
+            ...dbLesson,
+            videoUrl: dbLesson.video_url,
+            desc: dbLesson.description
+          });
+          setCourseData({
+            ...dbLesson.courses,
+            lessons: dbLesson.courses.lessons.map((l: any) => ({
+              ...l,
+              id: l.id,
+              completed: dbCompletedIds.includes(l.id)
+            }))
+          });
+        } else {
+           // FALLBACK: Use Mock Data if not in DB
+           const mockCourse = {
+            id: "c1",
+            title: "Futures Trading Masterclass",
+            lessons: [
+               { id: "l1", title: "Introduction & Platform Setup", is_locked: false, videoUrl: "/community/course videos/lesson-1.mp4", desc: "Setting up your charts and understanding the basic interface.", plan: 'basic' },
+               { id: "l2", title: "Market Structure Fundamentals", is_locked: false, videoUrl: "/community/course videos/lesson-2.mp4", desc: "Identifying trends, break of structure, and liquidity grabs.", plan: 'basic' },
+               { id: "l3", title: "Order Flow Mechanics", is_locked: false, videoUrl: "/community/course videos/lesson-3.mp4", desc: "Understanding the DOM, footprint charts, and aggressive vs passive buyers.", plan: 'basic' },
+               { id: "l4", title: "Sniper Entry Execution", is_locked: false, videoUrl: "/community/course videos/lesson-4.mp4", desc: "Putting it all together to execute high-probability low-risk setups.", plan: 'basic' }
+            ]
+          };
+          
+          const localCompleted = JSON.parse(localStorage.getItem("elite_completed_lessons") || "[]");
+          const activeMock = mockCourse.lessons.find(l => l.id === lessonId) || mockCourse.lessons[0];
+          
+          setActiveLesson(activeMock);
+          setCourseData({
+            ...mockCourse,
+            lessons: mockCourse.lessons.map(l => ({
+              ...l,
+              completed: localCompleted.includes(l.id)
+            }))
+          });
+          setCompletedLessons(localCompleted);
+        }
+      } catch (e) {
+        console.error("Lesson fetch error:", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchLessonData();
+  }, [lessonId, user, authLoading]);
+
+  // 2. Mark Lesson Complete (DB + Local Fallback)
+  const markLessonComplete = async (id: string) => {
+      // Update local state for UI
+      if (!completedLessons.includes(id)) {
+        const newCompleted = [...completedLessons, id];
+        setCompletedLessons(newCompleted);
+        localStorage.setItem("elite_completed_lessons", JSON.stringify(newCompleted));
+      }
+
+      // Sync to Database
+      if (user) {
+        try {
+          await supabase.from('lesson_progress').upsert({
+            user_id: user.id,
+            lesson_id: id,
+            completed_at: new Date().toISOString()
+          });
+        } catch (e) {
+          console.error("Progress sync error:", e);
+        }
       }
   };
 
-  // Hardcode the Basic Course layout referencing the local MP4 files
-  const courseData = {
-    id: "c1",
-    title: "Futures Trading Masterclass",
-    lessons: [
-       { id: "l1", title: "Introduction & Platform Setup", is_locked: false, videoUrl: "/community/course videos/lesson-1.mp4", desc: "Setting up your charts and understanding the basic interface.", plan: 'basic' },
-       { id: "l2", title: "Market Structure Fundamentals", is_locked: false, videoUrl: "/community/course videos/lesson-2.mp4", desc: "Identifying trends, break of structure, and liquidity grabs.", plan: 'basic' },
-       { id: "l3", title: "Order Flow Mechanics", is_locked: false, videoUrl: "/community/course videos/lesson-3.mp4", desc: "Understanding the DOM, footprint charts, and aggressive vs passive buyers.", plan: 'basic' },
-       { id: "l4", title: "Sniper Entry Execution", is_locked: false, videoUrl: "/community/course videos/lesson-4.mp4", desc: "Putting it all together to execute high-probability low-risk setups.", plan: 'basic' }
-    ]
-  };
-
-  // Inject dynamic completed status from local state into the course map
-  const hydratedCourseData = {
-     ...courseData,
-     lessons: courseData.lessons.map(l => ({
-        ...l,
-        completed: completedLessons.includes(l.id)
-     }))
-  };
-
-  // Find active and next lesson indices
-  const activeIndex = hydratedCourseData.lessons.findIndex(l => l.id === lessonId);
-  const activeLesson = hydratedCourseData.lessons[activeIndex] || hydratedCourseData.lessons[0];
-  
-  // Strict Access Logic
-  const hasAccess = activeLesson.plan === 'basic' || isPaid;
-
   const handleVideoEnded = () => {
-     // Mark current completed
+     if (!activeLesson) return;
      markLessonComplete(activeLesson.id);
 
-     // Check if there is a next lesson
-     const nextLesson = hydratedCourseData.lessons[activeIndex + 1];
+     const activeIndex = courseData.lessons.findIndex((l: any) => l.id === activeLesson.id);
+     const nextLesson = courseData.lessons[activeIndex + 1];
      if (nextLesson) {
-         // Auto-advance
          setTimeout(() => {
              router.push(`/portal/lesson/${nextLesson.id}`);
-         }, 1000); // 1 second delay feeling
+         }, 1000);
      }
   };
 
-  if (authLoading) {
+  if (authLoading || loading || !activeLesson) {
     return (
       <div className="flex h-screen items-center justify-center bg-black text-gold-500">
         <div className="w-8 h-8 border-4 border-gold-500/20 border-t-gold-500 rounded-full animate-spin"></div>
@@ -85,9 +151,11 @@ export default function LessonPage({ params }: { params: any }) {
     );
   }
 
+  const hasAccess = activeLesson.plan === 'basic' || isPaid || !activeLesson.is_locked;
+
   return (
     <div className="flex bg-[#030303] min-h-screen text-slate-200 font-sans selection:bg-gold-500 selection:text-black">
-      <LessonSidebar course={hydratedCourseData} isPaid={isPaid} />
+      <LessonSidebar course={courseData} isPaid={isPaid} />
 
       <main className="flex-1 lg:ml-80 h-screen overflow-y-auto w-full custom-scrollbar pt-16 lg:pt-0">
         
@@ -112,7 +180,7 @@ export default function LessonPage({ params }: { params: any }) {
                  {hasAccess ? (
                     <div className="aspect-video w-full bg-black">
                        <SecureVideoPlayer 
-                          url={activeLesson.videoUrl} 
+                          url={activeLesson.videoUrl || activeLesson.video_url} 
                           isPaid={isPaid}
                           isLocked={false}
                           userEmail={user?.email || "restricted@elitetrader.com"}
@@ -144,7 +212,7 @@ export default function LessonPage({ params }: { params: any }) {
                     {activeLesson.title}
                  </h1>
                  <p className="text-slate-400 leading-relaxed mb-8 max-w-3xl">
-                    {activeLesson.desc}
+                    {activeLesson.desc || activeLesson.description}
                  </p>
 
                  {/* Mock Resources */}

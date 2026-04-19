@@ -15,17 +15,40 @@ export default function AdminOverview() {
   });
 
   useEffect(() => {
-    // In a real scenario, this fetches from Supabase.
-    // For now we mock the data since we don't have the explicit user tables defined heavily.
-    setStats({
-      totalUsers: 142,
-      totalPayments: 24,
-      recentLogins: [
-        { email: "user1@example.com", joined: "2026-04-18", status: "Active" },
-        { email: "trader_pro@market.com", joined: "2026-04-18", status: "Active" },
-        { email: "crypto_whale@moon.io", joined: "2026-04-17", status: "Inactive" },
-      ]
-    });
+    async function fetchStats() {
+      try {
+        // Fetch total profiles (registered users)
+        const { count: userCount } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+
+        // Fetch total payments
+        const { count: paymentCount } = await supabase
+          .from('payments')
+          .select('*', { count: 'exact', head: true });
+
+        // Fetch recent logins/profiles
+        const { data: recentProfiles } = await supabase
+          .from('profiles')
+          .select('email, created_at')
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        setStats({
+          totalUsers: userCount || 0,
+          totalPayments: paymentCount || 0,
+          recentLogins: (recentProfiles || []).map(p => ({
+            email: p.email,
+            joined: new Date(p.created_at).toLocaleDateString(),
+            status: "Active"
+          }))
+        });
+      } catch (e) {
+        console.error("Admin stats fetch error:", e);
+      }
+    }
+    
+    fetchStats();
   }, []);
 
   return (
