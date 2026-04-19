@@ -243,10 +243,17 @@ const PillNav = ({
   };
 
   const isActive = (href) => {
+    if (!href) return false;
     if (href === '/') return pathname === '/';
     return pathname.startsWith(href) || (currentHash && href.includes(currentHash));
   };
-  const navItems = items.filter(item => !item.authRequired || (item.authRequired && user));
+
+  const navItems = items.map(item => {
+    if (item.label === 'Courses' && user) {
+      return { ...item, href: '/portal' };
+    }
+    return item;
+  }).filter(item => !item.authRequired || (item.authRequired && user));
 
   return (
     <div className={`pill-nav-container ${className}`}>

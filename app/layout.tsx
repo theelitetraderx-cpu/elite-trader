@@ -6,6 +6,9 @@ import CommunityPopup from "@/components/CommunityPopup";
 import SplashLoader from "@/components/SplashLoader";
 import CryptoChatWidget from '@/components/CryptoChatWidget';
 import { Toaster } from "sonner";
+import PortalProvider from "@/components/portal/PortalProvider";
+import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,24 +35,50 @@ export const metadata: Metadata = {
   description: "The premier learning platform for modern futures and crypto traders. Master professional strategies and risk management with The Elite Trader.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const { data: { user } } = await supabase.auth.getUser();
+
+  let initialIsPaid = false;
+  let initialIsAuthorized = false;
+
+  if (user) {
+    const allowedEmails = ["theelitetraderx@gmail.com", "theelitetradex@gmail.com"];
+    initialIsAuthorized = allowedEmails.includes(user.email?.toLowerCase() || "");
+    
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_paid')
+      .eq('id', user.id)
+      .single();
+    
+    initialIsPaid = profile?.is_paid || initialIsAuthorized;
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${inter.variable} antialiased font-inter`.trim().replace(/\s+/g, ' ')}
         suppressHydrationWarning
       >
-        <SplashLoader />
-        <CommunityPopup />
-        <CryptoChatWidget />
-        <Toaster theme="dark" position="top-right" />
-        <ClickSpark>
-          {children}
-        </ClickSpark>
+        <PortalProvider 
+          initialUser={user} 
+          initialIsPaid={initialIsPaid} 
+          initialIsAuthorized={initialIsAuthorized}
+        >
+          <SplashLoader />
+          <CommunityPopup />
+          <CryptoChatWidget />
+          <Toaster theme="dark" position="top-right" />
+          <ClickSpark>
+            {children}
+          </ClickSpark>
+        </PortalProvider>
       </body>
     </html>
   );

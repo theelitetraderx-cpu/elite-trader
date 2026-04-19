@@ -48,7 +48,7 @@ export default function LoginPage() {
 
         localStorage.setItem('isLoggedIn', 'true');
         window.dispatchEvent(new Event('auth-change'));
-        router.push('/');
+        router.push('/dashboard');
       }
     } catch (err: any) {
       if (err.message?.includes('Email not confirmed')) {
@@ -66,7 +66,7 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
         },
       });
       if (error) throw error;

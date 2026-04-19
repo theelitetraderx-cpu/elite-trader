@@ -12,28 +12,35 @@ import ProfileSection from "@/components/dashboard/ProfileSection";
 import FriendsSection from "@/components/dashboard/FriendsSection";
 import PaymentsSection from "@/components/dashboard/PaymentsSection";
 import NetworkCircles from "@/components/dashboard/NetworkCircles";
-import { CreditCard } from "lucide-react";
+import { usePortal } from "@/components/portal/PortalProvider";
 
 const supabase = createClient();
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState("profile");
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, isAuthorized } = usePortal();
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState("profile");
+
+  const tabs = useMemo(() => {
+    const baseTabs = [
+      { id: "profile", label: "Profile", icon: User },
+      { id: "portal", label: "Learning Portal", icon: ShieldCheck, highlight: true },
+      { id: "friends", label: "Friends", icon: Users },
+      { id: "payments", label: "Payments", icon: CreditCard },
+    ];
+    
+    if (isAuthorized) {
+        baseTabs.push({ id: "admin", label: "Admin Panel", icon: Shield, highlight: false });
+    }
+    
+    return baseTabs;
+  }, [isAuthorized]);
 
   useEffect(() => {
-    async function checkUser() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.push("/login");
-        return;
-      }
-      setUser(session.user);
-      setLoading(false);
+    if (!loading && !user) {
+      router.push("/login");
     }
-    checkUser();
-  }, [router]);
+  }, [user, loading, router]);
 
   if (loading) {
     return (
@@ -42,21 +49,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  const tabs = useMemo(() => {
-    const baseTabs = [
-      { id: "profile", label: "Profile", icon: User },
-      { id: "portal", label: "Learning Portal", icon: BookOpen, highlight: true },
-      { id: "friends", label: "Friends", icon: Users },
-      { id: "payments", label: "Payments", icon: CreditCard },
-    ];
-    
-    if (user?.email?.toLowerCase() === "theelitetradex@gmail.com") {
-        baseTabs.push({ id: "admin", label: "Admin Panel", icon: Shield, highlight: false });
-    }
-    
-    return baseTabs;
-  }, [user?.email]);
 
   return (
     <div className="bg-black min-h-screen text-slate-200 font-sans selection:bg-gold-500 selection:text-black scroll-smooth overflow-x-hidden">
@@ -103,9 +95,7 @@ export default function Dashboard() {
                 <button
                   key={tab.id}
                   onClick={() => {
-                    if (tab.id === "portal") {
-                      router.push("/portal");
-                    } else if (tab.id === "admin") {
+                    if (tab.id === "admin") {
                       router.push("/admin");
                     } else {
                       setActiveTab(tab.id);
@@ -164,6 +154,29 @@ export default function Dashboard() {
                 >
                   <div className="min-h-[500px]">
                     {activeTab === "profile" && <ProfileSection user={user} />}
+                    {activeTab === "portal" && (
+                        <div className="p-8">
+                             <div className="flex items-center justify-between mb-8">
+                                <div>
+                                    <h2 className="text-3xl font-black text-white uppercase tracking-tighter">Elite <span className="text-gold-500">Academy</span></h2>
+                                    <p className="text-slate-400">Your institution for market mastery.</p>
+                                </div>
+                                <button 
+                                    onClick={() => router.push('/portal')}
+                                    className="px-6 py-3 rounded-xl bg-gold-500 text-black font-black uppercase tracking-widest text-xs hover:scale-105 transition-all"
+                                >
+                                    Enter Full Portal
+                                </button>
+                             </div>
+                             <div className="p-20 rounded-[40px] bg-white/[0.02] border border-dashed border-white/10 flex flex-col items-center justify-center text-center">
+                                <ShieldCheck size={48} className="text-gold-500/50 mb-6" />
+                                <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-tight">Curriculum Ready</h3>
+                                <p className="text-slate-500 max-w-sm mb-8 text-sm">
+                                    Click the button above to launch the full learning experience with progress tracking and video mastery.
+                                </p>
+                             </div>
+                        </div>
+                    )}
                     {activeTab === "friends" && <FriendsSection user={user} />}
                     {activeTab === "payments" && <PaymentsSection user={user} />}
                   </div>
