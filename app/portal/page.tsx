@@ -7,6 +7,8 @@ import CourseSkeleton from "@/components/portal/CourseSkeleton";
 import { motion } from "framer-motion";
 import { createClient } from "@/utils/supabase/client";
 import { usePortal } from "@/components/portal/PortalProvider";
+import { ShieldCheck } from "lucide-react";
+import Link from "next/link";
 
 const supabase = createClient();
 

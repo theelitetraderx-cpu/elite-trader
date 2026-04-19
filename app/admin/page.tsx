@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, CreditCard, ActiveUsers, ShieldAlert } from "lucide-react";
+import { Users, CreditCard, Activity, TrendingUp } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { motion } from "framer-motion";
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Users, Share2, LogOut, ShieldCheck, Settings, Bell, ChevronRight, BookOpen, Shield } from "lucide-react";
+import { User, Users, Share2, LogOut, ShieldCheck, Settings, Bell, ChevronRight, BookOpen, Shield, CreditCard } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
