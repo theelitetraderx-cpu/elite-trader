@@ -5,6 +5,7 @@ import ClickSpark from "@/components/ClickSpark";
 import CommunityPopup from "@/components/CommunityPopup";
 import SplashLoader from "@/components/SplashLoader";
 import CryptoChatWidget from '@/components/CryptoChatWidget';
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,13 +38,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${inter.variable} antialiased font-inter`}
+        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${inter.variable} antialiased font-inter`.trim().replace(/\s+/g, ' ')}
+        suppressHydrationWarning
       >
         <SplashLoader />
         <CommunityPopup />
         <CryptoChatWidget />
+        <Toaster theme="dark" position="top-right" />
         <ClickSpark>
           {children}
         </ClickSpark>

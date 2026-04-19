@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Users, Share2, LogOut, ShieldCheck, Settings, Bell, ChevronRight } from "lucide-react";
+import { User, Users, Share2, LogOut, ShieldCheck, Settings, Bell, ChevronRight, BookOpen, Shield } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
@@ -43,11 +43,20 @@ export default function Dashboard() {
     );
   }
 
-  const tabs = [
-    { id: "profile", label: "Profile", icon: User },
-    { id: "friends", label: "Friends", icon: Users },
-    { id: "payments", label: "Payments", icon: CreditCard },
-  ];
+  const tabs = useMemo(() => {
+    const baseTabs = [
+      { id: "profile", label: "Profile", icon: User },
+      { id: "portal", label: "Learning Portal", icon: BookOpen, highlight: true },
+      { id: "friends", label: "Friends", icon: Users },
+      { id: "payments", label: "Payments", icon: CreditCard },
+    ];
+    
+    if (user?.email?.toLowerCase() === "theelitetradex@gmail.com") {
+        baseTabs.push({ id: "admin", label: "Admin Panel", icon: Shield, highlight: false });
+    }
+    
+    return baseTabs;
+  }, [user?.email]);
 
   return (
     <div className="bg-black min-h-screen text-slate-200 font-sans selection:bg-gold-500 selection:text-black scroll-smooth overflow-x-hidden">
@@ -93,9 +102,17 @@ export default function Dashboard() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    if (tab.id === "portal") {
+                      router.push("/portal");
+                    } else if (tab.id === "admin") {
+                      router.push("/admin");
+                    } else {
+                      setActiveTab(tab.id);
+                    }
+                  }}
                   className={`flex-shrink-0 lg:w-full flex items-center justify-between p-3 lg:p-4 rounded-2xl transition-all group ${
-                    isActive 
+                    isActive || tab.highlight
                     ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-black shadow-lg shadow-gold-500/20' 
                     : 'bg-white/[0.02] border border-white/5 text-slate-400 hover:bg-white/[0.05] hover:text-white'
                   }`}

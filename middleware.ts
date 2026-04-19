@@ -54,6 +54,22 @@ export async function middleware(request: NextRequest) {
   // We MUST await this to ensure the auth token is refreshed and cookies are set.
   const { supabase, response } = await createSupabaseClient(request);
 
+  // 4. Secure Route Protection
+  const isProtectedPath = 
+    request.nextUrl.pathname.startsWith('/dashboard') ||
+    request.nextUrl.pathname.startsWith('/portal');
+
+  if (isProtectedPath) {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    
+    if (!user || error) {
+      // Missing or invalid session, redirect to login
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = '/login';
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   return response;
 }
 
