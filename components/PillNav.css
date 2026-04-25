@@ -1,5 +1,5 @@
 .pill-nav-container {
-  position: absolute;
+  position: fixed;
   top: 1.5rem;
   left: 50%;
   transform: translateX(-50%);
@@ -19,36 +19,35 @@
 
 .pill-nav {
   --nav-h: 52px;
-  --logo: 40px;
-  --pill-pad-x: 24px;
-  --pill-gap: 4px;
-  width: max-content;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-sizing: border-box;
+  --logo: 36px;
+  --pill-pad-x: 20px;
+  --pill-gap: 2px;
+  padding: 0 12px;
 }
 
-@media (max-width: 1024px) {
-  .pill-nav {
-    width: 100%;
-    justify-content: space-between;
-    background: transparent;
-  }
+.unified-pill-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(4, 5, 12, 0.6);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  padding: 4px;
+  box-shadow: 
+    0 10px 30px -5px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
 }
 
 .pill-nav-items {
   position: relative;
-  display: none; /* Hidden by default, shown on large screens */
+  display: none; 
   align-items: center;
-  height: var(--nav-h);
-  background: rgba(6, 7, 20, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  height: calc(var(--nav-h) - 10px);
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 9999px;
-  padding: 4px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  padding: 2px;
 }
 
 @media (min-width: 1024px) {
@@ -58,19 +57,16 @@
 }
 
 .pill-logo {
-  width: var(--nav-h);
-  height: var(--nav-h);
+  width: calc(var(--nav-h) - 12px);
+  height: calc(var(--nav-h) - 12px);
   border-radius: 50%;
-  background: rgba(6, 7, 20, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px;
+  padding: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
   transition: all 0.3s ease;
 }
 

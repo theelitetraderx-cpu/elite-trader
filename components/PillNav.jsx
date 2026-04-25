@@ -18,6 +18,7 @@ const PillNav = ({
     { label: 'Courses', href: '/#courses' },
     { label: 'Pricing', href: '/#pricing' },
     { label: 'Community', href: '/community' },
+    { label: 'Portal', href: '/portal' },
     { label: 'Dashboard', href: '/dashboard', authRequired: true }
   ],
   className = '',
@@ -248,90 +249,87 @@ const PillNav = ({
     return pathname.startsWith(href) || (currentHash && href.includes(currentHash));
   };
 
-  const navItems = items.map(item => {
-    if (item.label === 'Courses' && user) {
-      return { ...item, href: '/portal' };
-    }
-    return item;
-  }).filter(item => !item.authRequired || (item.authRequired && user));
+  const navItems = items.filter(item => !item.authRequired || (item.authRequired && user));
 
   return (
     <div className={`pill-nav-container ${className}`}>
       <nav className="pill-nav" aria-label="Primary">
-        <Link
-          className="pill-logo"
-          href="/"
-          aria-label="Home"
-          onMouseEnter={handleLogoEnter}
-          ref={logoRef}
-        >
-          <img src={logo} alt={logoAlt} ref={logoImgRef} />
-        </Link>
+        <div className="unified-pill-wrapper">
+            <Link
+              className="pill-logo"
+              href="/"
+              aria-label="Home"
+              onMouseEnter={handleLogoEnter}
+              ref={logoRef}
+            >
+              <img src={logo} alt={logoAlt} ref={logoImgRef} />
+            </Link>
 
-        <div className="pill-nav-items" ref={navItemsRef}>
-          <ul className="pill-list" role="menubar">
-            {navItems.map((item, i) => {
-              const active = isActive(item.href);
-              return (
-                <li key={item.href || `item-${i}`} role="none">
-                  <Link
-                    role="menuitem"
-                    href={item.href}
-                    className={`pill ${active ? 'is-active' : ''}`}
-                    aria-label={item.ariaLabel || item.label}
-                    onMouseEnter={() => handleEnter(i)}
-                    onMouseLeave={() => handleLeave(i)}
-                  >
-                    <span
-                      className="hover-circle"
-                      aria-hidden="true"
-                      ref={el => {
-                        circleRefs.current[i] = el;
-                      }}
-                    />
-                    <span className="label-stack">
-                      <span className="pill-label">{item.label}</span>
-                      <span className="pill-label-hover" aria-hidden="true">
-                        {item.label}
-                      </span>
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+            <div className="pill-nav-items" ref={navItemsRef}>
+              <ul className="pill-list" role="menubar">
+                {navItems.map((item, i) => {
+                  const active = isActive(item.href);
+                  return (
+                    <li key={item.href || `item-${i}`} role="none">
+                      <Link
+                        role="menuitem"
+                        href={item.href}
+                        className={`pill ${active ? 'is-active' : ''}`}
+                        aria-label={item.ariaLabel || item.label}
+                        onMouseEnter={() => handleEnter(i)}
+                        onMouseLeave={() => handleLeave(i)}
+                      >
+                        <span
+                          className="hover-circle"
+                          aria-hidden="true"
+                          ref={el => {
+                            circleRefs.current[i] = el;
+                          }}
+                        />
+                        <span className="label-stack">
+                          <span className="pill-label">{item.label}</span>
+                          <span className="pill-label-hover" aria-hidden="true">
+                            {item.label}
+                          </span>
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
 
-        {/* Desktop Actions */}
-        <div className="desktop-actions ml-2">
-            {user ? (
-                <div className="relative flex items-center gap-3">
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer group">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center text-black font-bold text-xs uppercase shadow-[0_0_15px_rgba(212,175,55,0.3)]">
-                      {user.user_metadata?.first_name?.[0] || user.user_metadata?.full_name?.[0] || user.user_metadata?.name?.[0] || user.email?.[0] || 'U'}
+            {/* Desktop Actions */}
+            <div className="desktop-actions">
+                {user ? (
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3 px-3 py-1.5 rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-all cursor-pointer">
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-gold-500 to-gold-600 flex items-center justify-center text-black font-black text-[10px] uppercase shadow-lg shadow-gold-500/20">
+                          {user.user_metadata?.first_name?.[0] || user.user_metadata?.full_name?.[0] || user.user_metadata?.name?.[0] || user.email?.[0] || 'U'}
+                        </div>
+                        <span className="text-[11px] font-black text-white uppercase tracking-[0.1em] pr-1">
+                          {user.user_metadata?.first_name || user.user_metadata?.full_name?.split(' ')[0] || user.user_metadata?.name?.split(' ')[0] || 'Trader'}
+                        </span>
+                      </div>
+                      <button 
+                        onClick={handleSignOut}
+                        className="w-10 h-10 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                        title="Sign Out"
+                      >
+                        <LogOut size={16} />
+                      </button>
                     </div>
-                    <span className="text-[13px] font-bold text-white uppercase tracking-widest sm:block">
-                      {user.user_metadata?.first_name || user.user_metadata?.full_name?.split(' ')[0] || user.user_metadata?.name?.split(' ')[0] || 'Trader'}
-                    </span>
-                  </div>
-                  <button 
-                    onClick={handleSignOut}
-                    className="p-2.5 rounded-full border border-white/10 bg-white/5 hover:bg-red-500/10 hover:border-red-500/20 text-slate-400 hover:text-red-400 transition-all"
-                    title="Sign Out"
-                  >
-                    <LogOut size={18} />
-                  </button>
-                </div>
-            ) : (
-                <>
-                    <Link href="/login" className="text-[13px] font-bold text-slate-400 hover:text-gold-500 uppercase tracking-widest transition-colors px-4 py-2">
-                        Log In
-                    </Link>
-                    <Link href="/register" className="text-[13px] font-bold text-black bg-gold-500 hover:bg-gold-400 uppercase tracking-widest px-6 py-2.5 rounded-full transition-all shadow-lg shadow-gold-900/40">
-                        Register
-                    </Link>
-                </>
-            )}
+                ) : (
+                    <div className="flex items-center gap-2 pr-2">
+                        <Link href="/login" className="text-[11px] font-black text-slate-500 hover:text-white uppercase tracking-widest transition-colors px-4">
+                            Log In
+                        </Link>
+                        <Link href="/register" className="text-[11px] font-black text-black bg-gold-500 hover:bg-white uppercase tracking-widest px-5 py-2.5 rounded-full transition-all shadow-lg shadow-gold-500/20">
+                            Join
+                        </Link>
+                    </div>
+                )}
+            </div>
         </div>
 
         <button
@@ -344,6 +342,7 @@ const PillNav = ({
           <span className="hamburger-line" />
         </button>
       </nav>
+
 
       <div className="mobile-menu-popover" ref={mobileMenuRef}>
         <ul className="mobile-menu-list">

@@ -57,7 +57,7 @@ export default function Footer() {
           </p>
           
           <p className="text-slate-500 text-[10px] uppercase tracking-[0.2em] font-bold text-center">
-            Built by <span className="text-gold-500 hover:text-white transition-colors cursor-default">H2T Technologies</span> — <span className="text-slate-600 font-medium italic">Let’s Create Something Bold</span>
+            Built by <a href="https://h2t.tech" target="_blank" rel="noopener noreferrer" className="text-gold-500 hover:text-white transition-colors cursor-pointer">H2T Technologies</a> — <span className="text-slate-600 font-medium italic">Let’s Create Something Bold</span>
           </p>
 
           <div className="flex gap-6 text-[10px] uppercase tracking-widest font-bold text-slate-500">

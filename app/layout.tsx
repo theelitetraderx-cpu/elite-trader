@@ -35,6 +35,8 @@ export const metadata: Metadata = {
   description: "The premier learning platform for modern futures and crypto traders. Master professional strategies and risk management with The Elite Trader.",
 };
 
+import Navbar from "@/components/Navbar";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -52,12 +54,12 @@ export default async function RootLayout({
     initialIsAuthorized = allowedEmails.includes(user.email?.toLowerCase() || "");
     
     const { data: profile } = await supabase
-      .from('profiles')
-      .select('is_paid')
+      .from('users')
+      .select('status')
       .eq('id', user.id)
       .single();
     
-    initialIsPaid = profile?.is_paid || initialIsAuthorized;
+    initialIsPaid = profile?.status === 'approved' || initialIsAuthorized;
   }
 
   return (
@@ -71,6 +73,7 @@ export default async function RootLayout({
           initialIsPaid={initialIsPaid} 
           initialIsAuthorized={initialIsAuthorized}
         >
+          <Navbar />
           <SplashLoader />
           <CommunityPopup />
           <CryptoChatWidget />

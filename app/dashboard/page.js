@@ -5,11 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { User, Users, Share2, LogOut, ShieldCheck, Settings, Bell, ChevronRight, BookOpen, Shield, CreditCard } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BorderGlow from "@/components/BorderGlow";
 import ProfileSection from "@/components/dashboard/ProfileSection";
-import FriendsSection from "@/components/dashboard/FriendsSection";
+import AnnouncementsSection from "@/components/dashboard/AnnouncementsSection";
 import PaymentsSection from "@/components/dashboard/PaymentsSection";
 import NetworkCircles from "@/components/dashboard/NetworkCircles";
 import { usePortal } from "@/components/portal/PortalProvider";
@@ -17,7 +16,7 @@ import { usePortal } from "@/components/portal/PortalProvider";
 const supabase = createClient();
 
 export default function Dashboard() {
-  const { user, loading, isAuthorized } = usePortal();
+  const { user, loading, isAuthorized, profile } = usePortal();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");
 
@@ -25,7 +24,7 @@ export default function Dashboard() {
     const baseTabs = [
       { id: "profile", label: "Profile", icon: User },
       { id: "portal", label: "Learning Portal", icon: ShieldCheck, highlight: true },
-      { id: "friends", label: "Friends", icon: Users },
+      { id: "announcements", label: "Announcements", icon: Bell },
       { id: "payments", label: "Payments", icon: CreditCard },
     ];
     
@@ -52,7 +51,6 @@ export default function Dashboard() {
 
   return (
     <div className="bg-black min-h-screen text-slate-200 font-sans selection:bg-gold-500 selection:text-black scroll-smooth overflow-x-hidden">
-      <Navbar />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 relative z-10">
         
@@ -177,7 +175,7 @@ export default function Dashboard() {
                              </div>
                         </div>
                     )}
-                    {activeTab === "friends" && <FriendsSection user={user} />}
+                    {activeTab === "announcements" && <AnnouncementsSection user={user} profile={profile} />}
                     {activeTab === "payments" && <PaymentsSection user={user} />}
                   </div>
                 </BorderGlow>

@@ -39,34 +39,43 @@ export default function LessonSidebar({ course, isPaid }: LessonSidebarProps) {
   };
 
   const navContent = (
-    <div className="h-full flex flex-col pt-20 lg:pt-0">
-      <div className="p-6 border-b border-white/5">
-         <Link href="/portal" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors mb-6">
-            <ChevronLeft size={16} /> Back to Portal
-         </Link>
-         {course ? (
-             <h2 className="text-xl font-bold text-white leading-tight">{course.title}</h2>
-         ) : (
-             <h2 className="text-xl font-bold text-white leading-tight">Portal Menu</h2>
-         )}
+    <div className="h-full flex flex-col pt-20 lg:pt-0 bg-[#050505]">
+      <div className="p-8 border-b border-white/5">
+         <div className="flex flex-col gap-4">
+            <Link href="/dashboard" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-white transition-colors flex items-center gap-2">
+               <ChevronLeft size={14} /> Exit Portal
+            </Link>
+            {course ? (
+                <h2 className="text-lg font-black text-white uppercase tracking-tighter leading-tight">{course.title}</h2>
+            ) : (
+                <h2 className="text-lg font-black text-white uppercase tracking-tighter leading-tight">Elite Curriculum</h2>
+            )}
+         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-1">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-2">
         <Link 
             href="/portal"
             onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                pathname === "/portal" ? "bg-white/10 text-white font-semibold" : "text-slate-400 hover:bg-white/5 hover:text-white"
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                pathname === "/portal" ? "bg-white/5 text-white font-bold border border-white/10" : "text-slate-500 hover:text-white"
             }`}
         >
-            <LayoutDashboard size={18} />
-            <span className="text-sm font-medium uppercase tracking-wider">My Courses</span>
+            <LayoutDashboard size={16} />
+            <span className="text-[10px] font-black uppercase tracking-widest">My Courses</span>
         </Link>
+
+        <button 
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-500 w-full cursor-not-allowed opacity-50"
+        >
+            <CheckCircle size={16} />
+            <span className="text-[10px] font-black uppercase tracking-widest">Your Progress</span>
+        </button>
         
         {course && (
-            <div className="pt-6 pb-2 px-4">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600 mb-2">Lessons</p>
-                <div className="space-y-1 mt-3">
+            <div className="pt-8 space-y-4">
+                <p className="px-4 text-[9px] font-black uppercase tracking-[0.3em] text-slate-700">Course Content</p>
+                <div className="space-y-1">
                     {course.lessons.map((lesson, idx) => {
                        const isActive = pathname.includes(`/portal/lesson/${lesson.id}`);
                        const hasAccess = !lesson.is_locked || isPaid;
@@ -76,25 +85,26 @@ export default function LessonSidebar({ course, isPaid }: LessonSidebarProps) {
                             key={lesson.id}
                             href={`/portal/lesson/${lesson.id}`}
                             onClick={handleLinkClick}
-                            className={`group flex items-start gap-3 p-3 rounded-xl transition-all ${
+                            className={`group flex items-start gap-4 p-4 rounded-lg transition-all ${
                                 isActive 
-                                ? "bg-gradient-to-r from-gold-500/20 to-transparent border border-gold-500/20 text-white" 
-                                : "text-slate-400 hover:bg-white/5 hover:text-white border border-transparent"
+                                ? "bg-white/5 border border-white/10 text-white" 
+                                : "text-slate-500 hover:text-white border border-transparent"
                             }`}
                          >
-                            <div className="mt-0.5">
+                            <div className="mt-0.5 opacity-40">
                                {lesson.completed ? (
-                                  <CheckCircle size={16} className="text-gold-500" />
+                                  <CheckCircle size={14} className="text-green-500" />
                                ) : !hasAccess ? (
-                                  <Lock size={16} className="text-slate-600" />
+                                  <Lock size={14} />
                                ) : (
-                                  <PlayCircle size={16} className={isActive ? "text-gold-500" : "text-slate-500 group-hover:text-white"} />
+                                  <PlayCircle size={14} />
                                )}
                             </div>
                             <div>
-                                <p className={`text-sm font-medium ${isActive ? 'text-white' : ''}`}>
-                                  {idx + 1}. {lesson.title}
+                                <p className={`text-[11px] font-bold uppercase tracking-tight leading-snug ${isActive ? 'text-white' : ''}`}>
+                                  {lesson.title}
                                 </p>
+                                <span className="text-[9px] font-medium text-slate-600 block mt-1">Module {idx + 1}</span>
                             </div>
                          </Link>
                        )

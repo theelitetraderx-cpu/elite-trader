@@ -3,10 +3,9 @@
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
-import { Copy, Check, Send, ArrowLeft, ShieldCheck, Zap, Globe } from 'lucide-react';
+import { Copy, Check, Send, ArrowLeft, ShieldCheck, Zap, Globe, Star, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BorderGlow from '@/components/BorderGlow';
 
@@ -280,51 +279,82 @@ function EnrolContent() {
             transition={{ delay: 0.3 }}
             className="space-y-6"
           >
-            <motion.div 
-              whileHover={{ scale: 1.01 }}
-              className="relative bg-gradient-to-br from-gold-600 to-gold-700 rounded-3xl p-8 text-black shadow-lg shadow-gold-900/10 overflow-hidden"
-            >
-              {/* Animated shimmer sweep */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none"
-                animate={{ x: ['-150%', '250%'] }}
-                transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
-              />
-              {/* Pulse glow orb */}
-              <motion.div
-                className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-yellow-300/30 blur-2xl pointer-events-none"
-                animate={{ scale: [1, 1.4, 1], opacity: [0.4, 0.7, 0.4] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-              />
-              <div className="relative z-10">
+            {/* Elite Upsell Nudge - High Impact */}
+            {selectedPlan.name !== "Elite" && (
+              <motion.div 
+                whileHover={{ scale: 1.02 }}
+                className="relative bg-gradient-to-br from-gold-500 via-gold-600 to-gold-700 rounded-3xl p-8 text-black shadow-2xl shadow-gold-900/20 overflow-hidden"
+              >
+                {/* Animated highlights */}
                 <motion.div
-                  className="w-12 h-12 rounded-2xl bg-black/10 flex items-center justify-center mb-6"
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                >
-                  <Send size={24} />
-                </motion.div>
-                <h3 className="text-2xl font-black uppercase tracking-tight mb-4">Inr & Other<br />Payment Methods</h3>
-                <p className="text-black/70 text-sm font-medium mb-8 leading-relaxed">
-                  If you prefer to pay in INR (Unified Payments Interface) or other local methods, please contact our support directly on Telegram.
-                </p>
-                <motion.a
-                  href="https://t.me/Elitefuturetrades"
-                  target="_blank"
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
-                  className="w-full py-4 rounded-2xl bg-black text-white font-bold tracking-widest uppercase text-sm flex items-center justify-center gap-3 shadow-xl shadow-black/20 relative overflow-hidden"
-                >
-                  <motion.span
-                    animate={{ rotate: [0, 20, -20, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 pointer-events-none"
+                  animate={{ x: ['-200%', '300%'] }}
+                  transition={{ duration: 3, repeat: Infinity, repeatDelay: 1 }}
+                />
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-3 bg-black/10 rounded-2xl">
+                      <Star size={24} className="fill-black" />
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em]">Master's Choice</span>
+                  </div>
+
+                  <h3 className="text-3xl font-black uppercase tracking-tighter leading-none mb-6 font-outfit">
+                    The Elite <br /> Advantage
+                  </h3>
+                  
+                  <p className="text-black/80 text-sm font-bold mb-8 leading-relaxed italic">
+                    "Knowledge is common. Execution is rare. Build your execution edge with personal mentorship."
+                  </p>
+
+                  <div className="space-y-4 mb-8">
+                     <div className="flex items-center gap-2 group">
+                        <div className="w-1.5 h-1.5 bg-black rounded-full" />
+                        <span className="text-[11px] font-black uppercase tracking-wider">1-on-1 Mentorship</span>
+                     </div>
+                     <div className="flex items-center gap-2 group">
+                        <div className="w-1.5 h-1.5 bg-black rounded-full" />
+                        <span className="text-[11px] font-black uppercase tracking-wider">Direct Execution Guidance</span>
+                     </div>
+                     <div className="flex items-center gap-2 group">
+                        <div className="w-1.5 h-1.5 bg-black rounded-full" />
+                        <span className="text-[11px] font-black uppercase tracking-wider">Account Scaling Strategy</span>
+                     </div>
+                  </div>
+
+                  <Link
+                    href="/enrol?plan=Elite&price=$499"
+                    className="w-full py-4 rounded-2xl bg-black text-white font-black tracking-[0.2em] uppercase text-xs flex items-center justify-center gap-3 shadow-xl shadow-black/20"
                   >
-                    <Send size={18} />
-                  </motion.span>
-                  Contact Support
-                </motion.a>
+                    Upgrade to Elite – $499
+                    <ArrowRight size={16} />
+                  </Link>
+                </div>
+              </motion.div>
+            )}
+
+            {/* If they are already Elite, show them a trust box */}
+            {selectedPlan.name === "Elite" && (
+              <div className="bg-gold-500/10 border border-gold-500/20 rounded-3xl p-8">
+                <div className="flex items-center gap-3 mb-6">
+                   <div className="w-12 h-12 rounded-2xl bg-gold-500 flex items-center justify-center text-black">
+                      <ShieldCheck size={24} />
+                   </div>
+                   <div>
+                      <h3 className="text-xl font-bold uppercase tracking-tight">Institutional Enrollment</h3>
+                      <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Verified Priority Pass</p>
+                   </div>
+                </div>
+                <p className="text-slate-400 text-sm leading-relaxed mb-6 font-medium">
+                  You have selected the most complete professional path. As an Elite member, you get priority access to mentorship slots and direct performance reviews.
+                </p>
+                <div className="flex items-center gap-2 text-gold-500 text-[10px] font-black uppercase tracking-widest">
+                   <div className="w-2 h-2 bg-gold-500 rounded-full animate-pulse" />
+                   Priority Processing Active
+                </div>
               </div>
-            </motion.div>
+            )}
 
             <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8">
               <h4 className="text-sm font-bold uppercase tracking-widest text-gold-500 mb-6 flex items-center gap-2">
@@ -360,7 +390,6 @@ function EnrolContent() {
 export default function EnrolPage() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-gold-500">Initializing...</div>}>
-      <Navbar />
       <EnrolContent />
       <Footer />
     </Suspense>

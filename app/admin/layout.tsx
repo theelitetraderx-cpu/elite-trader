@@ -14,7 +14,8 @@ export default async function AdminLayout({
   
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user || user.email?.toLowerCase() !== "theelitetradex@gmail.com") {
+  const allowedAdmins = ["theelitetraderx@gmail.com", "theelitetradex@gmail.com"];
+  if (!user || !allowedAdmins.includes(user.email?.toLowerCase() || "")) {
     redirect("/dashboard");
   }
 

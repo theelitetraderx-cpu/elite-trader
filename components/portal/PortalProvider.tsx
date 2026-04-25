@@ -49,17 +49,17 @@ export default function PortalProvider({
 
       try {
         const { data, error } = await supabase
-          .from('profiles')
+          .from('users')
           .select('*')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (data) {
           setProfile(data);
           const allowedEmails = ["theelitetraderx@gmail.com", "theelitetradex@gmail.com"];
           const authorized = allowedEmails.includes(user.email?.toLowerCase() || "");
-          setIsAuthorized(authorized);
-          setIsPaid(data.is_paid || authorized);
+          setIsAuthorized(authorized || data.status === 'approved');
+          setIsPaid(data.status === 'approved' || authorized);
         }
       } catch (e) {
         console.error("PortalProvider fetch error:", e);

@@ -9,6 +9,7 @@ import { createClient } from "@/utils/supabase/client";
 import { usePortal } from "@/components/portal/PortalProvider";
 import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const supabase = createClient();
 
@@ -102,58 +103,62 @@ export default function PortalPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-[#050505] text-slate-300">
       <LessonSidebar course={null} isPaid={isPaid} />
       
-      <main className="flex-1 lg:ml-80 h-full overflow-y-auto custom-scrollbar relative pt-16 lg:pt-0">
-         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gold-500/5 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <main className="flex-1 lg:ml-80 h-full overflow-y-auto custom-scrollbar relative">
+         {/* Minimal Top Header */}
+         <header className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-[#050505]/80 backdrop-blur-md sticky top-0 z-30">
+            <div className="flex items-center gap-3">
+               <Image src="/image.png" alt="Logo" width={24} height={24} className="opacity-80" />
+               <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white">Elite Trader</span>
+            </div>
+            <nav className="hidden md:flex items-center gap-8">
+               {['Courses', 'Progress', 'Community', 'Profile'].map((item) => (
+                  <button key={item} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">
+                     {item}
+                  </button>
+               ))}
+            </nav>
+            <div className="flex items-center gap-4">
+               <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-slate-400">{user?.email?.[0].toUpperCase()}</span>
+               </div>
+            </div>
+         </header>
 
          {!isAuthorized ? (
-            <div className="h-full flex flex-col items-center justify-center px-6 text-center">
-               <div className="w-24 h-24 rounded-full bg-gold-500/10 border border-gold-500/20 flex items-center justify-center mb-8 shadow-[0_0_50px_rgba(212,175,55,0.1)]">
-                  <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 3 }}>
-                    <div className="w-12 h-12 bg-gold-500 rounded-lg flex items-center justify-center">
-                       <ShieldCheck className="text-black" size={24} />
-                    </div>
-                  </motion.div>
+            <div className="h-[calc(100vh-64px)] flex flex-col items-center justify-center px-6 text-center">
+               <div className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-8">
+                  <ShieldCheck className="text-white/20" size={32} />
                </div>
-               <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">Elite Access <span className="text-gold-500">Required</span></h2>
-               <p className="text-slate-400 max-w-md mb-10 leading-relaxed">
-                  The Elite Trader Learning Portal is currently in Early Access for founding members. 
-                  Contact support or purchase a plan to unlock the full institutional curriculum.
+               <h2 className="text-2xl font-black text-white uppercase tracking-tighter mb-4">Elite Access Required</h2>
+               <p className="text-slate-500 max-w-sm mb-10 text-sm leading-relaxed font-medium">
+                  The Elite Trader Learning Portal is currently restricted. 
+                  Please confirm your enrollment or contact your administrator.
                </p>
                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/enrol" className="px-8 py-4 rounded-xl bg-gold-500 text-black font-black uppercase tracking-widest text-sm hover:scale-105 transition-all shadow-[0_0_30px_rgba(212,175,55,0.2)]">
-                     View All Programs
-                  </Link>
-                  <Link href="/dashboard" className="px-8 py-4 rounded-xl bg-white/5 border border-white/10 text-white font-black uppercase tracking-widest text-sm hover:bg-white/10 transition-all">
+                  <Link href="/dashboard" className="px-8 py-4 rounded-xl bg-white text-black font-black uppercase tracking-widest text-xs hover:bg-slate-200 transition-all">
                      Back to Dashboard
                   </Link>
                </div>
             </div>
          ) : (
-            <div className="max-w-7xl mx-auto px-6 py-12 lg:py-20">
+            <div className="max-w-6xl mx-auto px-8 py-16">
                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6"
+                  className="mb-16 pb-12 border-b border-white/5"
                >
-                  <div>
-                     <h1 className="text-4xl lg:text-5xl font-black text-white uppercase tracking-tighter mb-4">
-                        Elite<span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-gold-600"> Academy</span>
-                     </h1>
-                     <p className="text-slate-400 max-w-2xl text-lg">
-                        Master the markets with our comprehensive trading curriculum. Select a course to continue your journey.
-                     </p>
-                  </div>
-                  
-                  <div className="px-6 py-3 rounded-full bg-gold-500/10 border border-gold-500/20 text-gold-500 font-black uppercase tracking-widest text-sm flex items-center gap-2">
-                     <div className="w-2 h-2 rounded-full bg-gold-500 animate-pulse"></div>
-                     Pro Dashboard
-                  </div>
+                  <h1 className="text-3xl lg:text-4xl font-black text-white uppercase tracking-tighter mb-3">
+                     Your Learning Dashboard
+                  </h1>
+                  <p className="text-slate-500 text-sm font-medium">
+                     Continue your trading programs and track your progress.
+                  </p>
                </motion.div>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                   {loading ? (
                       <>
                           <CourseSkeleton />
@@ -164,9 +169,9 @@ export default function PortalPage() {
                       courses.map((course, idx) => (
                           <motion.div
                               key={course.id}
-                              initial={{ opacity: 0, y: 20 }}
+                              initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: idx * 0.1 }}
+                              transition={{ delay: idx * 0.05 }}
                           >
                               <CourseCard
                                   id={course.id}
@@ -188,3 +193,4 @@ export default function PortalPage() {
     </div>
   );
 }
+

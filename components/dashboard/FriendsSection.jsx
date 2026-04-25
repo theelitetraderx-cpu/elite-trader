@@ -15,12 +15,12 @@ export default function FriendsSection({ user }) {
       setLoading(true);
       try {
         let query = supabase
-          .from('profiles')
+          .from('users')
           .select('*')
           .limit(20);
 
         if (searchTerm) {
-          query = query.ilike('full_name', `%${searchTerm}%`);
+          query = query.ilike('name', `%${searchTerm}%`);
         }
 
         const { data, error } = await query;
@@ -28,11 +28,11 @@ export default function FriendsSection({ user }) {
         
         const mappedUsers = data.map(profile => ({
           id: profile.id,
-          name: profile.full_name || profile.email?.split('@')[0] || "Trader",
-          role: profile.role || "Elite Trader",
+          name: profile.name || profile.email?.split('@')[0] || "Trader",
+          role: "Elite Trader",
           status: profile.status || "Active",
-          avatar: profile.avatar_url || `https://ui-avatars.com/api/?name=${profile.full_name || 'User'}&background=d4af37&color=000`,
-          active: profile.is_online || false
+          avatar: `https://ui-avatars.com/api/?name=${profile.name || 'User'}&background=d4af37&color=000`,
+          active: true
         }));
 
         setFriends(mappedUsers);

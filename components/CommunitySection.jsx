@@ -4,28 +4,12 @@ import BorderGlow from "./BorderGlow";
 
 const communities = [
   {
-    name: "Discord",
-    description: "Join our official trading floor for live callouts and active discussions.",
-    icon: <MessageSquare className="w-6 h-6" />,
-    href: "https://discord.gg/W36Es5ZAU8",
-    color: "from-gold-600 to-gold-400",
-    hex: "#d4af37"
-  },
-  {
     name: "Telegram",
     description: "Get real-time market updates, trade breakdowns, and technical analysis.",
     icon: <Send className="w-6 h-6" />,
     href: "https://t.me/Elitefuture",
     color: "from-gold-500 to-yellow-400",
     hex: "#d4af37"
-  },
-  {
-    name: "Instagram",
-    description: "Daily trade recaps, educational reels, and behind-the-scenes content.",
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>,
-    href: "https://www.instagram.com/theelitetrader.in?igsh=bHloN2xpaXg5cm5j",
-    color: "from-purple-600 to-pink-500",
-    hex: "#a855f7"
   }
 ];
 
@@ -51,7 +35,8 @@ export default function CommunitySection() {
              </p>
            </div>
            
-           <div className="w-full lg:w-1/2 grid grid-cols-1 sm:grid-cols-3 gap-6 reveal reveal-delayed-1">
+           <div className="w-full lg:w-1/2 flex justify-center reveal reveal-delayed-1">
+             <div className="w-full max-w-sm">
              {communities.map((item, i) => (
                <BorderGlow 
                  key={i} 
@@ -86,7 +71,8 @@ export default function CommunitySection() {
                  </div>
                </BorderGlow>
              ))}
-           </div>
+            </div>
+         </div>
         </div>
 
         {/* Call to Action Footer */}

@@ -57,7 +57,8 @@ export async function middleware(request: NextRequest) {
   // 4. Secure Route Protection
   const isProtectedPath = 
     request.nextUrl.pathname.startsWith('/dashboard') ||
-    request.nextUrl.pathname.startsWith('/portal');
+    request.nextUrl.pathname.startsWith('/portal') ||
+    request.nextUrl.pathname.startsWith('/admin');
 
   if (isProtectedPath) {
     const { data: { user }, error } = await supabase.auth.getUser();

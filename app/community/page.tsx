@@ -1,6 +1,5 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import RippleGrid from "@/components/RippleGrid";
 import CardSwap, { SwapCard } from "@/components/CardSwap";
@@ -10,46 +9,11 @@ import ElectricBorder from "@/components/ElectricBorder";
 
 const socialLinks = [
   {
-    name: "Discord",
-    description: "Join our official trading floor for live callouts and active discussions.",
-    icon: <MessageSquare className="w-8 h-8" />,
-    href: "https://discord.gg/W36Es5ZAU8",
-    color: "from-gold-600 to-gold-400",
-    shadow: "shadow-gold-500/20",
-    hex: "#d4af37"
-  },
-  {
     name: "Telegram",
     description: "Get real-time market updates, trade breakdowns, and technical analysis.",
     icon: <Send className="w-8 h-8" />,
     href: "https://t.me/Elitefuture",
     color: "from-gold-500 to-yellow-400",
-    shadow: "shadow-gold-500/20",
-    hex: "#d4af37"
-  },
-  {
-    name: "Instagram",
-    description: "Follow our daily trading lifestyle, behind-the-scenes content, and market insights.",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="32"
-        height="32"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-8 h-8"
-      >
-        <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-      </svg>
-    ),
-    href: "https://instagram.com",
-    color: "from-gold-500 to-yellow-500",
     shadow: "shadow-gold-500/20",
     hex: "#d4af37"
   }
@@ -58,7 +22,6 @@ const socialLinks = [
 export default function CommunityPage() {
   return (
     <main className="min-h-screen bg-[#060714] text-white">
-      <Navbar />
       
       {/* Background Ripple Grid */}
       <div className="fixed inset-0 z-0">
@@ -121,8 +84,8 @@ export default function CommunityPage() {
             </div>
           </div>
 
-          <h2 className="text-2xl md:text-3xl font-bold mb-12 tracking-tight">Join our Official Channels</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold mb-12 tracking-tight">Join our Official Channel</h2>
+          <div className="max-w-md mx-auto">
             {socialLinks.map((link) => (
               <ElectricBorder 
                 key={link.name} 
@@ -135,7 +98,7 @@ export default function CommunityPage() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`group relative p-8 h-full flex flex-col items-center bg-white/[0.02] transition-all duration-300 overflow-hidden`}
+                  className={`group relative p-8 h-full flex flex-col items-center bg-white/[0.02] transition-all duration-300 overflow-hidden text-center`}
                 >
                   {/* Gradient Background Effect on Hover */}
                   <div className={`absolute inset-0 bg-gradient-to-br ${link.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
@@ -150,8 +113,9 @@ export default function CommunityPage() {
                       {link.description}
                     </p>
                     
-                    <div className="mt-auto w-full pt-6 border-t border-white/5 flex items-center justify-end">
-                      <ArrowUpRight className="w-5 h-5 text-slate-500 group-hover:text-white transition-colors" />
+                    <div className="mt-auto w-full pt-6 border-t border-white/5 flex items-center justify-center">
+                      <span className="text-gold-500 font-bold uppercase tracking-widest text-[10px]">Open Telegram</span>
+                      <ArrowUpRight className="w-4 h-4 ml-2 text-gold-500" />
                     </div>
                   </div>
                 </a>

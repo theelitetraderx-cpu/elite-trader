@@ -17,19 +17,19 @@ export default function AdminOverview() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        // Fetch total profiles (registered users)
+        // Fetch total users (registered and approved users)
         const { count: userCount } = await supabase
-          .from('profiles')
+          .from('users')
           .select('*', { count: 'exact', head: true });
 
         // Fetch total payments
         const { count: paymentCount } = await supabase
-          .from('payments')
+          .from('pending_users') // Approximate or keep as is if payments are tracked elsewhere
           .select('*', { count: 'exact', head: true });
 
-        // Fetch recent logins/profiles
-        const { data: recentProfiles } = await supabase
-          .from('profiles')
+        // Fetch recent logins/users
+        const { data: recentUsers } = await supabase
+          .from('users')
           .select('email, created_at')
           .order('created_at', { ascending: false })
           .limit(5);
@@ -37,10 +37,10 @@ export default function AdminOverview() {
         setStats({
           totalUsers: userCount || 0,
           totalPayments: paymentCount || 0,
-          recentLogins: (recentProfiles || []).map(p => ({
+          recentLogins: (recentUsers || []).map(p => ({
             email: p.email,
             joined: new Date(p.created_at).toLocaleDateString(),
-            status: "Active"
+            status: "Approved"
           }))
         });
       } catch (e) {

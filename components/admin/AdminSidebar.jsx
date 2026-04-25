@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 
 const links = [
   { name: "Overview", href: "/admin", icon: LayoutDashboard },
+  { name: "Pending Approvals", href: "/admin/pending", icon: Users },
   { name: "Payments", href: "/admin/payments", icon: CreditCard },
   { name: "Course Manager", href: "/admin/courses", icon: Video },
 ];
