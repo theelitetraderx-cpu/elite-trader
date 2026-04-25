@@ -23,8 +23,9 @@ export async function POST(request) {
     // Convert attachment to buffer for Resend
     const buffer = Buffer.from(await attachment.arrayBuffer());
 
-    // Replace this with your verified domain email (e.g., info@yourdomain.com) once DNS is set up
-    const FROM_EMAIL = 'Elite Trader <notifications@theelitetrader.in>';
+    // Until you verify 'theelitetrader.in' in the Resend dashboard, 
+    // you must use 'onboarding@resend.dev' or a verified sender.
+    const FROM_EMAIL = 'Elite Trader <onboarding@resend.dev>';
     const TO_EMAIL = 'theelitetraderx@gmail.com';
 
     console.log(`[Notification] Sending payment proof from ${email} to ${TO_EMAIL}...`);
