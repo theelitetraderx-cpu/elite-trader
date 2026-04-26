@@ -108,24 +108,7 @@ export default function PortalPage() {
       
       <main className="flex-1 lg:ml-80 h-full overflow-y-auto custom-scrollbar relative">
          {/* Minimal Top Header */}
-         <header className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-[#050505]/80 backdrop-blur-md sticky top-0 z-30">
-            <div className="flex items-center gap-3">
-               <Image src="/image.png" alt="Logo" width={24} height={24} className="opacity-80" />
-               <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white">Elite Trader</span>
-            </div>
-            <nav className="hidden md:flex items-center gap-8">
-               {['Courses', 'Progress', 'Community', 'Profile'].map((item) => (
-                  <button key={item} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors">
-                     {item}
-                  </button>
-               ))}
-            </nav>
-            <div className="flex items-center gap-4">
-               <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                  <span className="text-[10px] font-bold text-slate-400">{user?.email?.[0].toUpperCase()}</span>
-               </div>
-            </div>
-         </header>
+         <div className="h-16" /> {/* Spacer for the fixed global navbar */}
 
          {!isAuthorized ? (
             <div className="h-[calc(100vh-64px)] flex flex-col items-center justify-center px-6 text-center">

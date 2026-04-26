@@ -23,6 +23,17 @@
   --pill-pad-x: 20px;
   --pill-gap: 2px;
   padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+@media (max-width: 1024px) {
+  .pill-nav {
+    justify-content: space-between;
+    width: 100%;
+  }
 }
 
 .unified-pill-wrapper {

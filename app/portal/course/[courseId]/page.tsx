@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
+
 
 const supabase = createClient();
 
@@ -113,7 +113,7 @@ export default function CourseDetailPage({ params }: { params: any }) {
 
   return (
     <div className="bg-[#030303] min-h-screen text-slate-200 font-sans selection:bg-gold-500 selection:text-black">
-      <Navbar />
+
       
       {/* Hero Section */}
       <section className="relative pt-40 pb-20 overflow-hidden">

@@ -41,11 +41,29 @@ export default function PortalProvider({
   const supabase = createClient();
 
   useEffect(() => {
+    // Auth Listener to update user state dynamically
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      if (event === 'SIGNED_OUT') {
+        setProfile(null);
+        setIsPaid(false);
+        setIsAuthorized(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  useEffect(() => {
     async function fetchDetails() {
       if (!user) {
         setLoading(false);
         return;
       }
+      
+      setLoading(true);
 
       try {
         const { data, error } = await supabase

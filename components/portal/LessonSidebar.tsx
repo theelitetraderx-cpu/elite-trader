@@ -118,11 +118,13 @@ export default function LessonSidebar({ course, isPaid }: LessonSidebarProps) {
 
   return (
     <>
-      {/* Mobile Hamburger */}
-      <div className="lg:hidden fixed top-0 left-0 w-full h-16 bg-black/80 backdrop-blur-md border-b border-white/5 z-40 flex items-center justify-between px-4">
-         <div className="font-bold uppercase tracking-widest text-white text-sm">EliteTrader Portal</div>
-         <button onClick={toggleSidebar} className="p-2 text-white bg-white/5 rounded-lg border border-white/10">
-            {isOpen ? <X size={20} /> : <Menu size={20} />}
+      {/* Mobile Sidebar Toggle Button (Discreet) */}
+      <div className="lg:hidden fixed bottom-6 right-6 z-[60]">
+         <button 
+           onClick={toggleSidebar} 
+           className="w-14 h-14 bg-gold-500 text-black rounded-full shadow-[0_0_20px_rgba(212,175,55,0.4)] flex items-center justify-center hover:scale-110 transition-transform"
+         >
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
          </button>
       </div>
 

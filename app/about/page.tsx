@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Navbar from '@/components/Navbar';
+
 import Footer from '@/components/Footer';
 import { TrendingUp, Target, Zap, Shield, Globe, Award, Calculator, ArrowRight, Send, MessageSquare } from 'lucide-react';
 import { gsap } from 'gsap';
@@ -49,7 +49,7 @@ export default function AboutPage() {
 
   return (
     <div className="bg-[#060714] min-h-screen text-slate-200 font-sans selection:bg-gold-500 selection:text-black">
-      <Navbar />
+
 
       <main className="pt-32 pb-20">
         {/* HERO SECTION */}
