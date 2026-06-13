@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Outfit, Inter } from "next/font/google";
+import { Geist, Geist_Mono, Outfit, Inter, Playfair_Display } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 import ClickSpark from "@/components/ClickSpark";
 import CommunityPopup from "@/components/CommunityPopup";
-import SplashLoader from "@/components/SplashLoader";
-import CryptoChatWidget from '@/components/CryptoChatWidget';
+import CryptoChatWidget from "@/components/CryptoChatWidget";
+import Navbar from "@/components/Navbar";
 import { Toaster } from "sonner";
-import PortalProvider from "@/components/portal/PortalProvider";
+import AuthProvider from "@/components/AuthProvider";
+import UnhandledRejectionGuard from "@/components/UnhandledRejectionGuard";
 import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,12 +31,17 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Elite Trader - Precision Trading",
-  description: "The premier learning platform for modern futures and crypto traders. Master professional strategies and risk management with The Elite Trader.",
+  description:
+    "The premier learning platform for modern futures and crypto traders. Master professional strategies and risk management with The Elite Trader.",
 };
-
-import Navbar from "@/components/Navbar";
 
 export default async function RootLayout({
   children,
@@ -44,44 +50,26 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
-  const { data: { user } } = await supabase.auth.getUser();
-
-  let initialIsPaid = false;
-  let initialIsAuthorized = false;
-
-  if (user) {
-    const allowedEmails = ["theelitetraderx@gmail.com", "theelitetradex@gmail.com"];
-    initialIsAuthorized = allowedEmails.includes(user.email?.toLowerCase() || "");
-    
-    const { data: profile } = await supabase
-      .from('users')
-      .select('status')
-      .eq('id', user.id)
-      .single();
-    
-    initialIsPaid = profile?.status === 'approved' || initialIsAuthorized;
-  }
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${inter.variable} antialiased font-inter`.trim().replace(/\s+/g, ' ')}
+        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${inter.variable} ${playfair.variable} antialiased font-inter`
+          .trim()
+          .replace(/\s+/g, " ")}
         suppressHydrationWarning
       >
-        <PortalProvider 
-          initialUser={user} 
-          initialIsPaid={initialIsPaid} 
-          initialIsAuthorized={initialIsAuthorized}
-        >
+        <AuthProvider initialUser={user}>
+          <UnhandledRejectionGuard />
           <Navbar />
-          <SplashLoader />
           <CommunityPopup />
           <CryptoChatWidget />
           <Toaster theme="dark" position="top-right" />
-          <ClickSpark>
-            {children}
-          </ClickSpark>
-        </PortalProvider>
+          <ClickSpark>{children}</ClickSpark>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -247,7 +247,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
         }
       });
     }),
-    [childArr, refs, width, height, onCardClick, computedSize.width, computedSize.height]
+    [childArr, refs, onCardClick, computedSize.width, computedSize.height]
   );
 
   return (

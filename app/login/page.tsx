@@ -1,262 +1,166 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, ArrowRight, Loader2, Phone, Mail } from 'lucide-react';
-import { createClient } from '@/utils/supabase/client';
-import PhoneInput from '@/components/PhoneInput';
+import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { User } from "lucide-react";
+import { getAuthErrorMessage } from "@/lib/auth/errors";
+import { hasSupabaseConfig } from "@/lib/supabase/env";
+import { getOAuthRedirectUrl } from "@/lib/auth/session";
+import { createClient } from "@/utils/supabase/client";
+import AuthShell, {
+  AuthBrand,
+  AuthInput,
+  AuthPasswordInput,
+  AuthSubmitButton,
+  AuthSocialButtons,
+  AuthFooter,
+} from "@/components/auth/AuthShell";
+import { completeClientSignIn } from "@/lib/auth/afterAuth";
 
 export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('+91 ');
-  const [password, setPassword] = useState('');
-  
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const supabase = createClient();
-  
   const router = useRouter();
+  const configReady = hasSupabaseConfig();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!configReady) {
+      setError("Authentication is not configured. Please contact support.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const response = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
       });
 
-      if (signInError) throw signInError;
+      const payload = await response.json();
 
-      if (data?.user) {
-        // Send email notification (fire and forget)
-        if (data.user.email) {
-          fetch('/api/auth/login-notify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              email: data.user.email,
-              firstName: data.user.user_metadata?.first_name || 'Trader'
-            }),
-          }).catch(err => console.error('Notification failed:', err));
-        }
+      if (!response.ok) {
+        throw new Error(payload.error || "Sign in failed. Please try again.");
+      }
 
-        localStorage.setItem('isLoggedIn', 'true');
-        window.dispatchEvent(new Event('auth-change'));
-        router.push('/dashboard');
+      const { data } = payload;
+
+      if (data?.session?.user) {
+        await completeClientSignIn(data.session);
+        router.refresh();
+        router.push("/dashboard");
+        return;
       }
-    } catch (err: any) {
-      if (err.message?.includes('Email not confirmed')) {
-        setError('Please check your inbox and verify your email address before signing in.');
-      } else {
-        setError(err.message || 'An error occurred during sign in.');
-      }
+
+      setError("Sign in failed. Please try again.");
+    } catch (err: unknown) {
+      setError(getAuthErrorMessage(err, "An error occurred during sign in."));
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
+    if (!configReady) {
+      setError("Authentication is not configured. Please contact support.");
+      return;
+    }
+
+    setError(null);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
+          redirectTo: getOAuthRedirectUrl("/dashboard"),
         },
       });
-      if (error) throw error;
-    } catch (err: any) {
-      setError(err.message);
+      if (oauthError) throw oauthError;
+    } catch (err: unknown) {
+      setError(getAuthErrorMessage(err, "Google sign-in failed. Please try again."));
     }
   };
 
   return (
-    <div className="min-h-screen flex bg-[#080808]">
+    <AuthShell>
+      <AuthBrand />
 
-      {/* ─── LEFT PANEL ─── */}
-      <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center overflow-hidden bg-black">
-        {/* Ambient gold glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.12)_0%,transparent_70%)]" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black to-transparent z-10" />
-        <div className="absolute top-0 left-0 right-0 h-1/4 bg-gradient-to-b from-black to-transparent z-10" />
+      <h1 className="text-2xl sm:text-3xl font-bold text-white text-center mb-1.5">
+        Welcome <span className="text-[#d4af37]">Back</span>
+      </h1>
+      <p className="text-slate-500 text-xs sm:text-sm text-center mb-5 leading-relaxed">
+        Access your trading dashboard, courses, and elite community.
+      </p>
 
-        {/* Logo */}
-        <div className="relative z-20 flex flex-col items-center mix-blend-screen">
-          <Image
-            src="/elite-logo.png"
-            alt="Elite Trader Logo"
-            width={320}
-            height={320}
-            className="object-contain"
-            priority
-          />
-          <div className="mt-8 text-center">
-            <p className="text-gold-400 text-xs tracking-[0.4em] uppercase font-semibold opacity-80">
-              Trade Smart. Trade Elite.
-            </p>
-            <div className="mt-4 h-px w-32 mx-auto bg-gradient-to-r from-transparent via-gold-500 to-transparent opacity-50" />
-          </div>
+      {error && (
+        <div className="mb-5 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+          {error}
         </div>
+      )}
 
-        {/* Bottom stat bar */}
-        <div className="absolute bottom-10 z-20 flex items-center gap-10 px-10">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-gold-400">98%</div>
-            <div className="text-[10px] text-slate-500 uppercase tracking-widest">Accuracy</div>
-          </div>
-          <div className="h-8 w-px bg-white/10" />
-          <div className="text-center">
-            <div className="text-2xl font-bold text-white">2+</div>
-            <div className="text-[10px] text-slate-500 uppercase tracking-widest">Years</div>
-          </div>
-          <div className="h-8 w-px bg-white/10" />
-          <div className="text-center">
-            <div className="text-2xl font-bold text-gold-400">300+</div>
-            <div className="text-[10px] text-slate-500 uppercase tracking-widest">Traders</div>
-          </div>
+      {!configReady && (
+        <div className="mb-5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-sm text-center">
+          Supabase environment variables are missing. Add NEXT_PUBLIC_SUPABASE_URL and
+          NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local.
         </div>
-      </div>
+      )}
 
-      {/* ─── RIGHT PANEL ─── */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-16 xl:px-24 bg-[#080808] relative">
-        {/* Subtle top gold line */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-gold-500/40 to-transparent" />
+      <form className="space-y-3" onSubmit={handleSubmit}>
+        <AuthInput
+          label="Email Address"
+          icon={User}
+          type="email"
+          value={email}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+          required
+          placeholder="Enter your email"
+        />
 
-        {/* Mobile logo */}
-        <div className="lg:hidden flex justify-center mb-10 mix-blend-screen">
-          <Image src="/elite-logo.png" alt="Elite Trader" width={100} height={100} className="object-contain" />
-        </div>
+        <AuthPasswordInput
+          label="Password"
+          value={password}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+          show={showPass}
+          onToggle={() => setShowPass(!showPass)}
+        />
 
-        {/* Header */}
-        <div className="mb-10">
-          <p className="text-gold-500 text-xs tracking-[0.3em] uppercase font-bold mb-3">Welcome Back</p>
-          <h1 className="text-4xl font-bold text-white tracking-tight leading-tight">
-            Sign in to your<br />account
-          </h1>
-          <p className="mt-3 text-slate-500 text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/register" className="text-gold-400 hover:text-gold-300 font-semibold transition-colors">
-              Create one free
-            </Link>
-          </p>
-          {error && (
-            <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-              {error}
-            </div>
-          )}
-        </div>
-
-        {/* Form */}
-        <form className="space-y-5" onSubmit={handleSubmit}>
-          {/* Email */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
-              Email Address
-            </label>
+        <div className="flex items-center justify-between pt-1">
+          <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="you@example.com"
-              className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-4 text-white placeholder-slate-600 focus:outline-none focus:border-gold-500/60 focus:bg-white/[0.05] transition-all text-sm"
+              type="checkbox"
+              className="w-4 h-4 rounded border-white/20 bg-[#0c0c0c] accent-[#d4af37]"
             />
-          </div>
-
-          {/* Phone Number */}
-          <PhoneInput 
-            value={phone}
-            onChange={(val: string) => setPhone(val)}
-            required={true}
-          />
-
-          {/* Password */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest">
-                Password
-              </label>
-              <a href="#" className="text-xs text-gold-500 hover:text-gold-400 transition-colors">
-                Forgot password?
-              </a>
-            </div>
-            <div className="relative">
-              <input
-                type={showPass ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                placeholder="••••••••"
-                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-5 py-4 text-white placeholder-slate-600 focus:outline-none focus:border-gold-500/60 focus:bg-white/[0.05] transition-all text-sm pr-12"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPass(!showPass)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-gold-400 transition-colors"
-              >
-                {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-          </div>
-
-          {/* Remember me */}
-          <div className="flex items-center gap-3">
-            <input id="remember" type="checkbox" className="w-4 h-4 rounded border border-white/10 bg-white/5 accent-gold-500 cursor-pointer" />
-            <label htmlFor="remember" className="text-sm text-slate-400 cursor-pointer select-none">Keep me signed in</label>
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full mt-2 py-4 rounded-xl bg-gold-500 hover:bg-gold-400 text-black font-bold text-sm tracking-widest uppercase transition-all shadow-[0_0_30px_rgba(212,175,55,0.25)] hover:shadow-[0_0_40px_rgba(212,175,55,0.4)] flex items-center justify-center gap-2 group ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            <span className="text-xs text-slate-400">Remember me</span>
+          </label>
+          <Link
+            href="#"
+            className="text-xs text-[#d4af37] hover:text-[#e8c96a] transition-colors"
           >
-            {loading ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              <>
-                Sign In
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
-          </button>
+            Forgot Password?
+          </Link>
+        </div>
 
-          {/* Divider */}
-          <div className="relative my-2">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/5" />
-            </div>
-            <div className="relative flex justify-center">
-              <span className="bg-[#080808] px-4 text-xs text-slate-600">or continue with</span>
-            </div>
-          </div>
+        <AuthSubmitButton loading={loading}>Sign In</AuthSubmitButton>
 
-          {/* Google */}
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            className="w-full py-4 rounded-xl border border-white/8 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/15 text-white text-sm font-medium transition-all flex items-center justify-center gap-3"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
-            Continue with Google
-          </button>
-        </form>
+        <AuthSocialButtons onGoogle={handleGoogleLogin} />
+      </form>
 
-        {/* Footer */}
-        <p className="mt-10 text-center text-xs text-slate-600">
-          © 2025 Elite Trader. All rights reserved.
-        </p>
-      </div>
-    </div>
+      <AuthFooter
+        prompt="New to The Elite Trader?"
+        linkHref="/register"
+        linkText="Create Account"
+      />
+    </AuthShell>
   );
 }

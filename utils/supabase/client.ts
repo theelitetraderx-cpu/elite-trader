@@ -1,11 +1,17 @@
 import { createBrowserClient } from "@supabase/ssr";
+import { getSupabaseAnonKey, getSupabaseUrl, hasSupabaseConfig } from "@/lib/supabase/env";
 
-// Use an empty string fallback to prevent @supabase/ssr from panicking during Next.js build-time prerendering
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY ?? "";
+let browserClient: ReturnType<typeof createBrowserClient> | null = null;
+let cachedKey = "";
 
-export const createClient = () =>
-  createBrowserClient(
-    supabaseUrl,
-    supabaseKey,
-  );
+export const createClient = () => {
+  const url = getSupabaseUrl();
+  const key = getSupabaseAnonKey();
+
+  if (!browserClient || cachedKey !== key || !hasSupabaseConfig()) {
+    browserClient = createBrowserClient(url, key);
+    cachedKey = key;
+  }
+
+  return browserClient;
+};

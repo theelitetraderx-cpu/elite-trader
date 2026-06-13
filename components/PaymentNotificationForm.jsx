@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, CheckCircle, AlertCircle, Loader2, Link as LinkIcon, Mail, ShieldCheck, Phone, Upload, FileText } from 'lucide-react';
 import PhoneInput from './PhoneInput';
 import { createClient } from '@/utils/supabase/client';
+import { getErrorMessage } from '@/lib/getErrorMessage';
 
 const supabase = createClient();
 
@@ -21,6 +22,7 @@ export default function PaymentNotificationForm({ planName, planPrice }) {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(null); // 'success' | 'error'
   const [errorMessage, setErrorMessage] = useState('');
+  const [emailWarning, setEmailWarning] = useState('');
   const fileInputRef = useRef(null);
 
   const isIndia = formData.phone.startsWith('+91');
@@ -36,6 +38,7 @@ export default function PaymentNotificationForm({ planName, planPrice }) {
     setLoading(true);
     setStatus(null);
     setErrorMessage('');
+    setEmailWarning('');
 
     if (!formData.proof) {
       setErrorMessage('Please upload a payment proof (screenshot or receipt).');
@@ -105,6 +108,13 @@ export default function PaymentNotificationForm({ planName, planPrice }) {
       if (response.ok) {
         console.log("✅ Email notification sent successfully");
         setStatus('success');
+        if (result.sandboxCopy) {
+          setEmailWarning(
+            `Resend test mode: confirmation copy sent to ${result.deliveredTo}. Forward it to ${result.intendedTo}, or verify your domain at resend.com/domains to email customers directly.`
+          );
+        } else if (result.warning) {
+          setEmailWarning(result.customerError || result.warning);
+        }
         setFormData({
           ...formData,
           phone: '',
@@ -119,30 +129,34 @@ export default function PaymentNotificationForm({ planName, planPrice }) {
     } catch (err) {
       console.error('❌ Submission Error:', err);
       setStatus('error');
-      setErrorMessage(err.message || 'Failed to submit details. Please try again.');
+      setErrorMessage(getErrorMessage(err, 'Failed to submit details. Please try again.'));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white/[0.03] border border-white/10 rounded-3xl p-8 relative"
+      className="rounded-2xl md:rounded-3xl border border-white/5 bg-white/[0.02] p-5 sm:p-6 md:p-8"
     >
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-12 h-12 rounded-2xl bg-gold-500/10 flex items-center justify-center border border-gold-500/20 shadow-[0_0_20px_rgba(212,175,55,0.05)]">
-          <ShieldCheck className="text-gold-500" size={24} />
+      <div className="flex items-center gap-3 mb-6 md:mb-8">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gold-500/10 flex items-center justify-center border border-gold-500/20 shrink-0">
+          <ShieldCheck className="text-gold-500" size={20} />
         </div>
         <div>
-          <h2 className="text-2xl font-black text-white uppercase tracking-tight">Confirm Payment</h2>
-          <p className="text-slate-500 text-sm font-medium">Capture your transaction details for verification</p>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-black text-white uppercase tracking-tight font-outfit">
+            Confirm Payment
+          </h2>
+          <p className="text-slate-500 text-xs sm:text-sm font-medium">
+            Capture your transaction details for verification
+          </p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
           {/* Email */}
           <div className="space-y-2">
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Email Address</label>
@@ -208,8 +222,7 @@ export default function PaymentNotificationForm({ planName, planPrice }) {
             )}
         </AnimatePresence>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Amount */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
           <div className="space-y-2">
             <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Amount Paid ($)</label>
             <div className="relative">
@@ -268,7 +281,7 @@ export default function PaymentNotificationForm({ planName, planPrice }) {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-5 rounded-2xl bg-gold-500 hover:bg-gold-400 text-black font-black text-sm uppercase tracking-[0.15em] transition-all ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-[0.98]'} flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(212,175,55,0.15)]`}
+          className={`w-full py-4 md:py-5 rounded-xl md:rounded-2xl bg-gold-500 hover:bg-gold-400 text-black font-black text-[10px] sm:text-xs uppercase tracking-[0.15em] transition-all ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:scale-[1.01] active:scale-[0.99]'} flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(212,175,55,0.15)]`}
         >
           {loading ? (
             <Loader2 className="animate-spin" size={20} />
@@ -291,7 +304,10 @@ export default function PaymentNotificationForm({ planName, planPrice }) {
               <CheckCircle size={24} className="shrink-0 mt-0.5" />
               <div>
                  <p className="font-bold text-white mb-1">Details Received</p>
-                 <p className="text-green-400/80">Your notification has been sent to the admin. Verification usually takes 1-6 hours.</p>
+                 <p className="text-green-400/80">Your payment details have been submitted. A confirmation email has been sent to your Gmail — verification usually takes 1–6 hours.</p>
+                 {emailWarning && (
+                   <p className="text-amber-300/90 text-xs mt-2">{emailWarning}</p>
+                 )}
               </div>
             </motion.div>
           )}

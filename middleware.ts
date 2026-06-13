@@ -55,10 +55,7 @@ export async function middleware(request: NextRequest) {
   const { supabase, response } = await createSupabaseClient(request);
 
   // 4. Secure Route Protection
-  const isProtectedPath = 
-    request.nextUrl.pathname.startsWith('/dashboard') ||
-    request.nextUrl.pathname.startsWith('/portal') ||
-    request.nextUrl.pathname.startsWith('/admin');
+  const isProtectedPath = request.nextUrl.pathname.startsWith('/dashboard');
 
   if (isProtectedPath) {
     const { data: { user }, error } = await supabase.auth.getUser();

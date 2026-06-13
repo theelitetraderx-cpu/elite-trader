@@ -12,7 +12,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="inline-flex items-center gap-2 mb-6">
               <div className="w-8 h-8 relative flex items-center justify-center overflow-hidden">
-                <img src="/site-logo.png" alt="The Elite Trader Logo" className="w-full h-full object-contain drop-shadow-[0_0_5px_rgba(212,175,55,0.3)]" />
+                <img src="/logo.png" alt="The Elite Trader Logo" className="w-full h-full object-contain drop-shadow-[0_0_5px_rgba(212,175,55,0.3)] mix-blend-lighten" />
               </div>
               <span className="text-white font-medium text-xl tracking-wide">The Elite<span className="text-gold-500 font-light ml-1">Trader</span></span>
             </Link>
@@ -26,7 +26,7 @@ export default function Footer() {
             <h4 className="text-white font-medium mb-6">Explore</h4>
             <ul className="space-y-4 text-sm text-slate-400">
               <li><Link href="#courses" className="hover:text-gold-500 transition-colors">All Courses</Link></li>
-              <li><a href="https://t.me/Elitefuturetrades" target="_blank" className="hover:text-gold-500 transition-colors">Pricing & Plans</a></li>
+              <li><Link href="/#pricing" className="hover:text-gold-500 transition-colors">Pricing & Plans</Link></li>
               <li><Link href="#" className="hover:text-gold-500 transition-colors">Student Success</Link></li>
               <li><Link href="#" className="hover:text-gold-500 transition-colors">Live Coaching</Link></li>
             </ul>
@@ -45,7 +45,8 @@ export default function Footer() {
                 </button>
               </li>
               <li><Link href="/community" className="hover:text-gold-500 transition-colors">Community</Link></li>
-              <li><Link href="#" className="hover:text-gold-500 transition-colors">Contact</Link></li>
+              <li><Link href="/signals" className="hover:text-gold-500 transition-colors">Live Signals</Link></li>
+              <li><Link href="/#contact" className="hover:text-gold-500 transition-colors">Contact</Link></li>
             </ul>
           </div>
 
