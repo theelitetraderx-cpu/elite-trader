@@ -1,4 +1,8 @@
 import { getAdminEmail, getSiteUrl, sendResendEmail } from "@/lib/email/resend";
+import {
+  generateInvoiceNumber,
+  generateInvoicePdf,
+} from "@/lib/invoice/generateInvoicePdf";
 
 export { getAdminEmail } from "@/lib/email/resend";
 
@@ -53,19 +57,6 @@ function detailsTable(details: PaymentDetails, status: string, statusColor: stri
   `;
 }
 
-export function buildPaymentReceivedEmailHtml(details: PaymentDetails) {
-  const body = `
-    <p style="color: #94a3b8; line-height: 1.7; font-size: 15px; margin: 0 0 12px;">
-      Thank you for submitting your payment details to <strong style="color: #e8c96a;">The Elite Trader</strong>.
-      We have received your proof and our team will verify it shortly.
-    </p>
-    ${detailsTable(details, "Pending verification", "#fbbf24")}
-    <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin: 0;">
-      Verification usually takes 1–6 hours. You will receive another email once your payment is confirmed.
-    </p>
-  `;
-  return emailShell("Payment Details Received", body);
-}
 
 export function buildPaymentVerifiedEmailHtml(details: PaymentDetails) {
   const body = `
@@ -81,11 +72,53 @@ export function buildPaymentVerifiedEmailHtml(details: PaymentDetails) {
   return emailShell("Payment Verified Successfully", body);
 }
 
-export async function sendPaymentReceivedEmail(email: string, details: PaymentDetails) {
+export async function sendCustomerInvoiceEmail(
+  email: string,
+  details: PaymentDetails & { invoiceNumber?: string }
+) {
+  const invoiceNumber = details.invoiceNumber ?? generateInvoiceNumber();
+  const invoiceDate = new Date();
+
+  const pdfBuffer = await generateInvoicePdf({
+    customerEmail: email,
+    phone: details.phone,
+    planName: details.planName,
+    amount: details.amount,
+    network: details.network,
+    invoiceNumber,
+    invoiceDate,
+  });
+
+  const amount = details.amount.startsWith("$") ? details.amount : `$${details.amount}`;
+
   return sendResendEmail({
     to: email,
-    subject: `Payment received — ${details.planName} | The Elite Trader`,
-    html: buildPaymentReceivedEmailHtml(details),
+    subject: `Your Invoice — ${details.planName} | The Elite Trader`,
+    html: `
+      <div style="font-family: 'Inter', Arial, sans-serif; background: #080808; color: #ffffff; padding: 40px 24px; border-radius: 16px; border: 1px solid rgba(212, 175, 55, 0.25); max-width: 600px; margin: auto;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h1 style="color: #d4af37; margin: 0; font-size: 22px; letter-spacing: 0.2em; text-transform: uppercase;">The Elite Trader</h1>
+        </div>
+        <h2 style="color: #ffffff; font-size: 18px; margin: 0 0 12px;">Your invoice is attached</h2>
+        <p style="color: #94a3b8; line-height: 1.7; font-size: 15px; margin: 0 0 16px;">
+          Thank you for your payment of <strong style="color: #e8c96a;">${amount}</strong> for the
+          <strong style="color: #e8c96a;">${details.planName}</strong> program.
+          Please find your invoice (<strong>${invoiceNumber}</strong>) attached as a PDF.
+        </p>
+        <p style="color: #64748b; font-size: 13px; line-height: 1.6; margin: 0;">
+          Our team will verify your payment within 1–6 hours. You will receive a confirmation email once approved.
+        </p>
+        <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); text-align: center;">
+          <p style="font-size: 12px; color: #475569; margin: 0;">© ${new Date().getFullYear()} The Elite Trader</p>
+        </div>
+      </div>
+    `,
+    attachments: [
+      {
+        filename: `Invoice-${invoiceNumber}.pdf`,
+        content: pdfBuffer,
+      },
+    ],
   });
 }
 
@@ -109,24 +142,29 @@ export async function sendAdminPaymentNotification(options: {
 }) {
   const { customerEmail, phone, amount, plan, network, aadhaar, pan, attachment } = options;
 
+  const paymentDetails: PaymentDetails = {
+    planName: plan,
+    amount,
+    network,
+    phone,
+  };
+
+  const adminBody = `
+    <p style="color: #94a3b8; line-height: 1.7; font-size: 14px; margin: 0 0 12px;">
+      A customer has submitted a payment for verification. Payment proof is attached.
+    </p>
+    <p style="color: #e2e8f0; font-size: 14px; margin: 0 0 8px;"><strong>Customer:</strong> ${customerEmail}</p>
+    ${phone ? `<p style="color: #e2e8f0; font-size: 14px; margin: 0 0 8px;"><strong>Phone:</strong> ${phone}</p>` : ""}
+    ${aadhaar ? `<p style="color: #94a3b8; font-size: 13px; margin: 0 0 16px;">Aadhaar: ${aadhaar} · PAN: ${pan}</p>` : ""}
+    ${detailsTable(paymentDetails, "Pending verification", "#fbbf24")}
+    <p style="color: #64748b; font-size: 13px; margin: 0;">Review the attached payment proof and approve from the admin dashboard.</p>
+  `;
+
   return sendResendEmail({
     to: getAdminEmail(),
     replyTo: customerEmail,
-    subject: `[PAYMENT] Notification from ${customerEmail}`,
-    html: `
-      <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #d4af37; border-radius: 12px; background: #050505; color: white;">
-        <h2 style="color: #d4af37; text-transform: uppercase; letter-spacing: 2px;">New Payment Received</h2>
-        <p style="color: #64748b; font-size: 14px;">A customer has submitted a payment notification for verification.</p>
-        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-          <tr><td style="padding: 10px 0; color: #64748b;">Customer Email</td><td style="padding: 10px 0; font-weight: bold;">${customerEmail}</td></tr>
-          <tr><td style="padding: 10px 0; color: #64748b;">Phone</td><td style="padding: 10px 0; font-weight: bold;">${phone || "Not provided"}</td></tr>
-          <tr><td style="padding: 10px 0; color: #64748b;">Amount</td><td style="padding: 10px 0; font-weight: bold; color: #d4af37;">${amount}</td></tr>
-          <tr><td style="padding: 10px 0; color: #64748b;">Plan</td><td style="padding: 10px 0; font-weight: bold;">${plan}</td></tr>
-          <tr><td style="padding: 10px 0; color: #64748b;">Network</td><td style="padding: 10px 0; font-weight: bold;">${network}</td></tr>
-        </table>
-        ${aadhaar ? `<p style="color: #94a3b8; font-size: 13px;">Aadhaar: ${aadhaar} · PAN: ${pan}</p>` : ""}
-      </div>
-    `,
+    subject: `[PAYMENT] ${plan} — ${amount} from ${customerEmail}`,
+    html: emailShell("New Payment Submission", adminBody),
     attachments: [{ filename: attachment.name, content: attachment.buffer }],
   });
 }

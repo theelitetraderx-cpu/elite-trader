@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   sendAdminPaymentNotification,
-  sendPaymentReceivedEmail,
+  sendCustomerInvoiceEmail,
 } from "@/lib/email/paymentEmail";
 import { getResendClient } from "@/lib/email/resend";
 
@@ -51,7 +51,7 @@ export async function POST(request) {
       });
     }
 
-    const customerResult = await sendPaymentReceivedEmail(email, {
+    const customerResult = await sendCustomerInvoiceEmail(email, {
       planName: plan,
       amount,
       network,
@@ -59,11 +59,11 @@ export async function POST(request) {
     });
 
     if (!customerResult.ok) {
-      console.error("Customer payment email failed:", customerResult.error);
+      console.error("Customer invoice email failed:", customerResult.error);
       return NextResponse.json({
         success: true,
         id: adminResult.data?.id,
-        warning: "Payment submitted successfully. Admin notified. Customer confirmation email could not be sent.",
+        warning: "Payment submitted successfully. Admin notified. Invoice email could not be sent.",
         customerError: customerResult.error,
       });
     }
@@ -76,8 +76,8 @@ export async function POST(request) {
       deliveredTo: customerResult.deliveredTo,
       intendedTo: customerResult.intendedTo,
       message: customerResult.sandboxCopy
-        ? "Payment submitted. Confirmation copy sent to our team inbox (Resend test mode)."
-        : "Payment submitted successfully. Check your email for confirmation.",
+        ? "Payment submitted. Invoice copy sent to our team inbox (Resend test mode)."
+        : "Payment submitted successfully. Check your email for your invoice PDF.",
     });
   } catch (err) {
     console.error("API Error:", err);

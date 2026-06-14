@@ -110,12 +110,14 @@ export default function PaymentNotificationForm({ planName, planPrice }) {
           console.log("✅ Email notification sent successfully");
           if (result.sandboxCopy) {
             setEmailWarning(
-              `Payment received! A confirmation copy was sent to our team inbox (${result.deliveredTo}). We will verify your payment and email you at ${result.intendedTo || formData.email} shortly.`
+              `Payment received! Your invoice was sent to our team inbox (${result.deliveredTo}). We will verify and email you at ${result.intendedTo || formData.email} shortly.`
             );
           } else if (result.message) {
             setEmailWarning(result.message);
           } else if (result.warning) {
             setEmailWarning(result.warning);
+          } else {
+            setEmailWarning('Payment submitted! Check your email for your invoice PDF.');
           }
         } else {
           console.warn("Email notification issue:", result.error || result.warning);
