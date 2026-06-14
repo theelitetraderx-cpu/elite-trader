@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Footer from '@/components/Footer';
 import EnrolHeader from '@/components/enrol/EnrolHeader';
@@ -16,7 +16,13 @@ import {
   getSignalPrices,
   buildEnrolUrl,
 } from '@/lib/plans';
-import { isValidCoupon, COUPON_STORAGE_KEY } from '@/lib/coupon';
+import {
+  isValidCoupon,
+  ENROL_COUPON_SESSION_KEY,
+  ENROL_COUPON_CODE_SESSION_KEY,
+  COUPON_STORAGE_KEY,
+  COUPON_CODE_STORAGE_KEY,
+} from '@/lib/coupon';
 
 function EnrolContent() {
   const searchParams = useSearchParams();
@@ -30,23 +36,67 @@ function EnrolContent() {
       PLANS[2];
 
   const [couponActive, setCouponActive] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponFlash, setCouponFlash] = useState(false);
 
   useEffect(() => {
+    // Coupon applies on enrol page only — clear legacy pricing-page storage
+    localStorage.removeItem(COUPON_STORAGE_KEY);
+    localStorage.removeItem(COUPON_CODE_STORAGE_KEY);
+
     const fromUrl = couponParam ? isValidCoupon(couponParam) : false;
-    const fromStorage =
+    const fromSession =
       typeof window !== 'undefined' &&
-      localStorage.getItem(COUPON_STORAGE_KEY) === 'true';
-    setCouponActive(Boolean(fromUrl || fromStorage));
+      sessionStorage.getItem(ENROL_COUPON_SESSION_KEY) === 'true';
+    const savedCode =
+      typeof window !== 'undefined'
+        ? sessionStorage.getItem(ENROL_COUPON_CODE_SESSION_KEY) || ''
+        : '';
+
+    if (fromUrl || fromSession) {
+      setCouponActive(true);
+      setCouponCode(
+        fromUrl && couponParam ? couponParam.toUpperCase() : savedCode
+      );
+    }
   }, [couponParam]);
+
+  const triggerFlash = useCallback(() => {
+    setCouponFlash(true);
+    window.setTimeout(() => setCouponFlash(false), 1400);
+  }, []);
+
+  const handleApplyCoupon = useCallback(
+    (code) => {
+      const wasActive = couponActive;
+      setCouponActive(true);
+      setCouponCode(code);
+      sessionStorage.setItem(ENROL_COUPON_SESSION_KEY, 'true');
+      sessionStorage.setItem(ENROL_COUPON_CODE_SESSION_KEY, code);
+      if (!wasActive) {
+        triggerFlash();
+      }
+    },
+    [couponActive, triggerFlash]
+  );
+
+  const handleClearCoupon = useCallback(() => {
+    setCouponActive(false);
+    setCouponCode('');
+    sessionStorage.removeItem(ENROL_COUPON_SESSION_KEY);
+    sessionStorage.removeItem(ENROL_COUPON_CODE_SESSION_KEY);
+  }, []);
 
   const planPrices = isSignals
     ? getSignalPrices(selectedPlan)
     : getPlanPrices(selectedPlan, couponActive);
-  const planPrice = searchParams.get('price') || planPrices.priceLabel;
+  const planPrice = isSignals
+    ? searchParams.get('price') || planPrices.priceLabel
+    : planPrices.priceLabel;
   const eliteEnrolHref = buildEnrolUrl(
     ELITE_PLAN,
     couponActive,
-    couponActive ? couponParam || undefined : ''
+    couponActive ? couponCode : ''
   );
   const displayPlanName = isSignals
     ? `${selectedPlan.name} – ${selectedPlan.label}`
@@ -69,7 +119,11 @@ function EnrolContent() {
             planPrice={planPrice}
             planPrices={planPrices}
             couponActive={couponActive}
+            couponFlash={couponFlash}
+            isSignals={isSignals}
             selectedPlan={selectedPlan}
+            onApplyCoupon={handleApplyCoupon}
+            onClearCoupon={handleClearCoupon}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">

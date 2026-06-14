@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import "./globals.css";
 import ClickSpark from "@/components/ClickSpark";
 import CommunityPopup from "@/components/CommunityPopup";
+import LeadCapturePopup from "@/components/LeadCapturePopup";
 import CryptoChatWidget from "@/components/CryptoChatWidget";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "sonner";
@@ -66,6 +67,7 @@ export default async function RootLayout({
           <UnhandledRejectionGuard />
           <Navbar />
           <CommunityPopup />
+          <LeadCapturePopup />
           <CryptoChatWidget />
           <Toaster theme="dark" position="top-right" />
           <ClickSpark>{children}</ClickSpark>

@@ -4,11 +4,8 @@ import { Radio, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import BorderGlow from "@/components/BorderGlow";
 import { SIGNAL_PLANS, getSignalPrices, buildEnrolUrl } from "@/lib/plans";
-import { usePricing } from "./pricing/PricingProvider";
 
 export default function SignalsPricing({ embedded = false }) {
-  const { couponCode } = usePricing();
-
   return (
     <section
       id="signals"
@@ -93,7 +90,7 @@ export default function SignalsPricing({ embedded = false }) {
                   </p>
 
                   <Link
-                    href={buildEnrolUrl(plan, false, couponCode, plan.label)}
+                    href={buildEnrolUrl(plan, false, "", plan.label)}
                     className={`w-full py-3 rounded-xl flex items-center justify-center gap-2 font-black uppercase tracking-widest text-[10px] transition-all ${
                       isFeatured
                         ? "bg-gold-500 text-black hover:bg-gold-400"

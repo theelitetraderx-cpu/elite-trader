@@ -1,22 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Zap, Target, Star, ArrowRight } from "lucide-react";
+import { Target, Zap, Star, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ComparisonModal from "./ComparisonModal";
 import PlanCard from "./pricing/PlanCard";
-import CouponBar from "./pricing/CouponBar";
 import { usePricing } from "./pricing/PricingProvider";
-import { ELITE_PLAN } from "@/lib/plans";
+import { ELITE_PLAN, getPlanPrices } from "@/lib/plans";
 
 const PLAN_ICONS = [Target, Zap, Star];
 
 export default function Pricing() {
-  const { plans, couponApplied, getEnrolHref } = usePricing();
+  const { plans, getEnrolHref } = usePricing();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPlanIdx, setSelectedPlanIdx] = useState(2);
   const router = useRouter();
+
+  const eliteListPrice = getPlanPrices(ELITE_PLAN, false).priceLabel;
+  const eliteMemberPrice = getPlanPrices(ELITE_PLAN, true).priceLabel;
 
   useEffect(() => {
     const focus = sessionStorage.getItem("pricing_focus_plan");
@@ -52,7 +54,7 @@ export default function Pricing() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[600px] bg-gold-600/5 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-10 max-w-3xl mx-auto">
+          <div className="text-center mb-12 max-w-3xl mx-auto">
             <div className="text-gold-500 text-[10px] font-black uppercase tracking-[0.5em] mb-4">
               Professional Funding Path
             </div>
@@ -60,17 +62,10 @@ export default function Pricing() {
               Ready to <span className="text-gold-500">Master</span> the Markets?
             </h2>
             <p className="text-slate-400 text-sm md:text-lg font-medium leading-relaxed">
-              Apply your coupon to unlock member pricing. Most serious traders choose ELITE.
+              Choose your path below. Enter your member code on the enrolment page to unlock
+              discounted pricing.
             </p>
           </div>
-
-          <CouponBar className="mb-12 max-w-4xl mx-auto" />
-
-          {!couponApplied && (
-            <p className="text-center text-[11px] text-slate-500 font-semibold uppercase tracking-widest mb-8 -mt-4">
-              Apply coupon for Foundation $49 · PRO $249 · ELITE $499
-            </p>
-          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
             {plans.map((plan, i) => (
@@ -97,8 +92,8 @@ export default function Pricing() {
               </h3>
               <p className="text-slate-400 text-sm mt-2 max-w-lg">
                 Everything in PRO plus elite entry models, A+ setups, live strategy breakdowns,
-                and private community
-                {couponApplied ? " — now $499 with your coupon." : " — $499 with coupon applied."}
+                and private community — {eliteListPrice} list, {eliteMemberPrice} with member code
+                at enrolment.
               </p>
             </div>
             <Link

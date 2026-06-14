@@ -88,8 +88,12 @@ export default function Benefits() {
             <span className="block text-gold-500 mt-2">not just knowledge.</span>
           </h2>
           <p className="text-slate-400 text-sm md:text-base font-medium leading-relaxed max-w-2xl mx-auto">
-            Plans from <span className="text-white">$49 / $249 / $499</span> with coupon
-            applied. The difference is how far you go.
+            Plans from <span className="text-white">$49 / $249 / $499</span> with your member
+            code on{" "}
+            <Link href="/enrol" className="text-gold-500 hover:text-gold-400 font-semibold">
+              enrolment
+            </Link>
+            . The difference is how far you go.
           </p>
         </div>
 

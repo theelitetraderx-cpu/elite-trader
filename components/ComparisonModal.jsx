@@ -42,12 +42,11 @@ export default function ComparisonModal({
   onClose,
   initialPlanIndex = 0,
 }) {
-  const { plans, couponApplied, getPrices, getEnrolHref } = usePricing();
+  const { plans, getPrices, getEnrolHref } = usePricing();
   const consideringPlan = plans[initialPlanIndex] ?? plans[0];
   const isConsideringSmallPlan = initialPlanIndex < 2;
-  const upgradeDelta = getUpgradeDelta(consideringPlan, couponApplied);
+  const upgradeDelta = getUpgradeDelta(consideringPlan, true);
   const consideringPrices = getPrices(consideringPlan);
-  const elitePrices = getPrices(ELITE_PLAN);
 
   if (!isOpen) return null;
 
@@ -111,9 +110,7 @@ export default function ComparisonModal({
                           community access.
                         </p>
                         <p className="text-[11px] text-gold-500/80 font-bold uppercase tracking-widest">
-                          {couponApplied
-                            ? `ELITE member price — ${elitePrices.listLabel} → ${elitePrices.priceLabel}`
-                            : `Apply coupon — ELITE $599 → $499`}
+                          Member code at enrolment — ELITE $599 → $499
                         </p>
                       </div>
                       <div className="flex flex-col gap-3 w-full lg:w-auto lg:min-w-[260px]">
@@ -122,7 +119,7 @@ export default function ComparisonModal({
                           onClick={onClose}
                           className="w-full py-4 px-6 rounded-2xl bg-gold-500 text-black font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-gold-400 transition-colors"
                         >
-                          Upgrade to ELITE – {elitePrices.priceLabel}
+                          Upgrade to ELITE — $499 w/ code
                           <ArrowRight size={16} />
                         </Link>
                         <Link
