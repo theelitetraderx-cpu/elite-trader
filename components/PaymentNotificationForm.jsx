@@ -91,41 +91,54 @@ export default function PaymentNotificationForm({ planName, planPrice }) {
 
       if (dbError) {
         console.error('❌ DB Error:', dbError);
-        throw new Error(dbError.message); // 🔥 STOP HERE
+        throw new Error(dbError.message);
       }
 
       console.log('✅ Inserted Record:', insertedData);
 
-      // 2. Send email notification (Only if DB succeeded)
+      // 2. Send email notification (payment already saved — never block user on email failure)
       console.log("Sending admin email notification...");
-      const response = await fetch("/api/notify-admin", {
-        method: "POST",
-        body: data
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        console.log("✅ Email notification sent successfully");
-        setStatus('success');
-        if (result.sandboxCopy) {
-          setEmailWarning(
-            `Resend test mode: confirmation copy sent to ${result.deliveredTo}. Forward it to ${result.intendedTo}, or verify your domain at resend.com/domains to email customers directly.`
-          );
-        } else if (result.warning) {
-          setEmailWarning(result.customerError || result.warning);
-        }
-        setFormData({
-          ...formData,
-          phone: '',
-          aadhaar: '',
-          pan: '',
-          proof: null
+      try {
+        const response = await fetch("/api/notify-admin", {
+          method: "POST",
+          body: data
         });
-        if (fileInputRef.current) fileInputRef.current.value = '';
-      } else {
-        throw new Error(result.error || 'Email notification failed');
+
+        const result = await response.json();
+
+        if (response.ok && result.success !== false) {
+          console.log("✅ Email notification sent successfully");
+          if (result.sandboxCopy) {
+            setEmailWarning(
+              `Payment received! A confirmation copy was sent to our team inbox (${result.deliveredTo}). We will verify your payment and email you at ${result.intendedTo || formData.email} shortly.`
+            );
+          } else if (result.message) {
+            setEmailWarning(result.message);
+          } else if (result.warning) {
+            setEmailWarning(result.warning);
+          }
+        } else {
+          console.warn("Email notification issue:", result.error || result.warning);
+          setEmailWarning(
+            'Payment submitted successfully. Our team will verify your payment and contact you shortly.'
+          );
+        }
+      } catch (emailErr) {
+        console.warn("Email notification failed after DB save:", emailErr);
+        setEmailWarning(
+          'Payment submitted successfully. Our team will verify your payment and contact you shortly.'
+        );
       }
+
+      setStatus('success');
+      setFormData({
+        ...formData,
+        phone: '',
+        aadhaar: '',
+        pan: '',
+        proof: null
+      });
+      if (fileInputRef.current) fileInputRef.current.value = '';
     } catch (err) {
       console.error('❌ Submission Error:', err);
       setStatus('error');

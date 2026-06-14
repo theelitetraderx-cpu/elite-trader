@@ -23,7 +23,10 @@ export async function POST(request) {
     }
 
     if (!getResendClient()) {
-      return NextResponse.json({ error: "Resend API key is not configured." }, { status: 500 });
+      return NextResponse.json({
+        success: true,
+        warning: "Payment saved. Email service is not configured — our team will still review your submission.",
+      });
     }
 
     const buffer = Buffer.from(await attachment.arrayBuffer());
@@ -41,7 +44,11 @@ export async function POST(request) {
 
     if (!adminResult.ok) {
       console.error("Resend admin error:", adminResult.error);
-      return NextResponse.json({ error: adminResult.error }, { status: 500 });
+      return NextResponse.json({
+        success: true,
+        warning: "Payment saved. Email notification could not be sent — our team will still review your submission.",
+        emailError: adminResult.error,
+      });
     }
 
     const customerResult = await sendPaymentReceivedEmail(email, {
@@ -56,7 +63,7 @@ export async function POST(request) {
       return NextResponse.json({
         success: true,
         id: adminResult.data?.id,
-        warning: "Payment submitted. Admin notified, but customer confirmation email failed.",
+        warning: "Payment submitted successfully. Admin notified. Customer confirmation email could not be sent.",
         customerError: customerResult.error,
       });
     }
@@ -68,6 +75,9 @@ export async function POST(request) {
       sandboxCopy: customerResult.sandboxCopy,
       deliveredTo: customerResult.deliveredTo,
       intendedTo: customerResult.intendedTo,
+      message: customerResult.sandboxCopy
+        ? "Payment submitted. Confirmation copy sent to our team inbox (Resend test mode)."
+        : "Payment submitted successfully. Check your email for confirmation.",
     });
   } catch (err) {
     console.error("API Error:", err);
