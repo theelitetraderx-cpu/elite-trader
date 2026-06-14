@@ -71,6 +71,10 @@ export default function PaymentNotificationForm({ planName, planPrice }) {
       data.append("plan", planName);
       data.append("network", formData.network);
       data.append("attachment", formData.proof);
+      if (isIndia) {
+        data.append("aadhaar", formData.aadhaar);
+        data.append("pan", formData.pan.toUpperCase());
+      }
       
       console.log("Submitting data:", formData);
 

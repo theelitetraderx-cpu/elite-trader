@@ -12,6 +12,8 @@ type PaymentDetails = {
   network?: string;
   phone?: string;
   txHash?: string;
+  aadhaar?: string;
+  pan?: string;
 };
 
 function emailShell(title: string, body: string) {
@@ -45,6 +47,8 @@ function detailsTable(details: PaymentDetails, status: string, statusColor: stri
         <tr><td style="padding: 8px 0; color: #64748b;">Amount</td><td style="padding: 8px 0; text-align: right; font-weight: bold; color: #d4af37;">${amount}</td></tr>
         ${details.network ? `<tr><td style="padding: 8px 0; color: #64748b;">Network</td><td style="padding: 8px 0; text-align: right;">${details.network}</td></tr>` : ""}
         ${details.phone ? `<tr><td style="padding: 8px 0; color: #64748b;">Phone</td><td style="padding: 8px 0; text-align: right;">${details.phone}</td></tr>` : ""}
+        ${details.aadhaar ? `<tr><td style="padding: 8px 0; color: #64748b;">Aadhaar</td><td style="padding: 8px 0; text-align: right; font-weight: bold;">${details.aadhaar}</td></tr>` : ""}
+        ${details.pan ? `<tr><td style="padding: 8px 0; color: #64748b;">PAN</td><td style="padding: 8px 0; text-align: right; font-weight: bold; text-transform: uppercase;">${details.pan}</td></tr>` : ""}
         ${details.txHash ? `<tr><td style="padding: 8px 0; color: #64748b;">Tx Hash</td><td style="padding: 8px 0; text-align: right; font-size: 10px; color: #94a3b8; word-break: break-all;">${details.txHash}</td></tr>` : ""}
         <tr>
           <td style="padding: 8px 0; color: #64748b;">Status</td>
@@ -147,6 +151,8 @@ export async function sendAdminPaymentNotification(options: {
     amount,
     network,
     phone,
+    aadhaar: aadhaar ?? undefined,
+    pan: pan ?? undefined,
   };
 
   const adminBody = `
@@ -154,8 +160,7 @@ export async function sendAdminPaymentNotification(options: {
       A customer has submitted a payment for verification. Payment proof is attached.
     </p>
     <p style="color: #e2e8f0; font-size: 14px; margin: 0 0 8px;"><strong>Customer:</strong> ${customerEmail}</p>
-    ${phone ? `<p style="color: #e2e8f0; font-size: 14px; margin: 0 0 8px;"><strong>Phone:</strong> ${phone}</p>` : ""}
-    ${aadhaar ? `<p style="color: #94a3b8; font-size: 13px; margin: 0 0 16px;">Aadhaar: ${aadhaar} · PAN: ${pan}</p>` : ""}
+    ${phone ? `<p style="color: #e2e8f0; font-size: 14px; margin: 0 0 16px;"><strong>Phone:</strong> ${phone}</p>` : ""}
     ${detailsTable(paymentDetails, "Pending verification", "#fbbf24")}
     <p style="color: #64748b; font-size: 13px; margin: 0;">Review the attached payment proof and approve from the admin dashboard.</p>
   `;
