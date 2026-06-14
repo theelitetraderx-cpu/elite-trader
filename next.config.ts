@@ -1,11 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Stable CSS chunk paths in dev; avoids stale layout.css 404 loops after cache wipes
+  experimental: {
+    optimizePackageImports: ["lucide-react", "framer-motion"],
+  },
   webpack: (config, { dev, isServer }) => {
-    // Avoid corrupted persistent webpack cache on Windows (especially paths with spaces).
-    // A bad cache causes missing chunk files and endless 404s for layout.css in dev.
     if (dev) {
-      config.cache = { type: "memory" };
+      // Disable persistent disk cache in dev (fixes corrupt layout.css on Windows)
+      config.cache = false;
     }
 
     if (!isServer) {
