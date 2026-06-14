@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Send, Image as ImageIcon, Loader2, ShieldAlert, CheckCircle2, Trash2, ShieldCheck } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { isSiteAdmin } from "@/lib/constants/admin";
 
 const supabase = createClient();
 
@@ -15,7 +16,7 @@ export default function AnnouncementsSection({ user, profile }) {
   const [image, setImage] = useState(null);
   const fileInputRef = useRef(null);
 
-  const isAdmin = ["theelitetraderx@gmail.com", "theelitetradex@gmail.com"].includes(user?.email?.toLowerCase());
+  const isAdmin = isSiteAdmin(user?.email);
   // Access: if admin OR if plan is Elite
   const isElite = profile?.plan === "Elite" || isAdmin;
 

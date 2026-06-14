@@ -1,4 +1,8 @@
 import { Resend } from "resend";
+import {
+  SITE_ADMIN_EMAIL,
+  normalizeAdminEmail,
+} from "@/lib/constants/admin";
 
 let resendClient: Resend | null = null;
 
@@ -21,13 +25,16 @@ export function getSiteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "https://theelitetrader.in";
 }
 
+/** Canonical admin / Resend account owner inbox — see lib/constants/admin.ts */
+export { SITE_ADMIN_EMAIL } from "@/lib/constants/admin";
+
 /** Resend sandbox account owner — only this inbox can receive mail without a verified domain. */
 export function getResendOwnerEmail() {
-  return (
+  const raw =
     process.env.RESEND_OWNER_EMAIL ??
     process.env.ADMIN_EMAIL ??
-    "theelitetraderx@gmail.com"
-  );
+    SITE_ADMIN_EMAIL;
+  return normalizeAdminEmail(raw);
 }
 
 /**
@@ -47,7 +54,7 @@ export function getAdminEmail() {
   if (isResendSandbox()) {
     return getResendOwnerEmail();
   }
-  return process.env.ADMIN_EMAIL ?? getResendOwnerEmail();
+  return normalizeAdminEmail(process.env.ADMIN_EMAIL ?? SITE_ADMIN_EMAIL);
 }
 
 export function isResendSandboxRestrictionError(message: string) {
