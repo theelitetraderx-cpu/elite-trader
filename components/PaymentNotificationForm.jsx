@@ -281,20 +281,11 @@ export default function PaymentNotificationForm({ planName, planPrice }) {
           </div>
         </div>
 
-        {/* Network Selection (Keep as helpful context) */}
-        <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Network Used</label>
-            <select
-                value={formData.network}
-                onChange={(e) => setFormData({ ...formData, network: e.target.value })}
-                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-4 text-sm text-white focus:outline-none focus:border-gold-500/50 focus:bg-black/60 transition-all appearance-none cursor-pointer"
-            >
-                <option value="USDT (BEP-20)">USDT (BEP-20) - Binance Smart Chain</option>
-                <option value="USDT (ERC-20)">USDT (ERC-20) - Ethereum</option>
-                <option value="USDT (TRC-20)">USDT (TRC-20) - Tron</option>
-                <option value="Direct Bank Transfer">Direct Bank Transfer</option>
-                <option value="Other">Other</option>
-            </select>
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+          <p className="text-[10px] font-black text-amber-400 uppercase tracking-[0.2em] mb-1">
+            Payment Network
+          </p>
+          <p className="text-sm text-white font-medium">USDT (BEP-20) — BNB Smart Chain only</p>
         </div>
 
         <button

@@ -5,7 +5,7 @@ import { ShieldCheck, Star, ArrowRight } from "lucide-react";
 import { getPlanPrices } from "@/lib/plans";
 
 const STEPS = [
-  { step: "01", text: "Select your preferred USDT network" },
+  { step: "01", text: "Send USDT on BEP-20 (BNB Smart Chain) only" },
   { step: "02", text: "Scan the QR code or copy the address" },
   { step: "03", text: "Complete the transfer from your wallet" },
   { step: "04", text: "Finalize by sending the receipt" },

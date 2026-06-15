@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ComparisonModal from "./ComparisonModal";
 import PlanCard from "./pricing/PlanCard";
+import PromoCodeBar from "./PromoCodeBar";
 import { usePricing } from "./pricing/PricingProvider";
 import { ELITE_PLAN, getPlanPrices } from "@/lib/plans";
 
@@ -104,6 +105,8 @@ export default function Pricing() {
               <ArrowRight size={14} />
             </Link>
           </div>
+
+          <PromoCodeBar />
         </div>
 
         <ComparisonModal
